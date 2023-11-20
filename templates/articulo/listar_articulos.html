@@ -1,0 +1,60 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Articulos</h1>
+        <a href="{% url "crear_articulo" %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> Nuevo articulo</a>
+    </div>
+    <!-- Content Row -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Lista</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Código SKU</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Unidad de Medida</th>
+                        <th scope="col">Grupo</th>
+                        <th scope="col">Línea</th>
+                        <th scope="col">Sublínea</th>
+                        <th scope="col">Empresa</th>
+                        <th scope="col">Factor de Compra</th>
+                        <th scope="col">Factor de Reparto</th>
+                        <th scope="col">Marca</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for articulo in articulos %}
+                        <tr>
+                        <td>{{ articulo.codigo_sku }}</td>
+                        <td>{{ articulo.descripcion }}</td>
+                        <td>{{ articulo.unidad_medida }}</td>
+                        <td>{{ articulo.grupo }}</td>
+                        <td>{{ articulo.linea }}</td>
+                        <td>{{ articulo.sublinea }}</td>
+                        <td>{{ articulo.empresa }}</td>
+                        <td>{{ articulo.factor_compra }}</td>
+                        <td>{{ articulo.factor_reparto }}</td>
+                        <td>{{ articulo.marca }}</td>
+                        <td>
+                            <a href="{% url 'editar_articulo' articulo.id %}" class="btn btn-sm btn-warning">Editar</a>
+                            <a href="{% url 'eliminar_articulo' articulo.id %}"class="btn btn-sm btn-danger">Eliminar</a>
+                        </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

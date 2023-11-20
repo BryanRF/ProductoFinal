@@ -1,0 +1,54 @@
+<!-- listar_items_inventario.html -->
+{% extends 'master.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Lista de Items de Inventario</h1>
+        <a href="{% url 'crear_item_inventario' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> Nuevo Item de Inventario</a>
+    </div>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Lista</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Inventario</th>
+                            <th scope="col">Nro de Item</th>
+                            <th scope="col">Articulo</th>
+                            <th scope="col">Stock Físico</th>
+                            <th scope="col">Devoluciones Pendientes</th>
+                            <th scope="col">Total Unidades Stock</th>
+                            <th scope="col">Precio Costo</th>
+                            <th scope="col">Total Item</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>{{ item.inventario.nro_inventario }}</td>
+                                <td>{{ item.nro_item }}</td>
+                                <td>{{ item.articulo.codigo_sku }}</td>
+                                <td>{{ item.stock_fisico }}</td>
+                                <td>{{ item.devoluciones_pendientes }}</td>
+                                <td>{{ item.total_unidades_stock }}</td>
+                                <td>{{ item.precio_costo }}</td>
+                                <td>{{ item.total_item }}</td>
+                                <td>
+                                    <a href="{% url 'editar_item_inventario' item.id %}" class="btn btn-warning">Editar</a>
+                                    <a href="{% url 'eliminar_item_inventario' item.id %}" class="btn btn-danger">Eliminar</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
