@@ -79,54 +79,6 @@ class SublineasArticulos(models.Model):
     def __str__(self):
         return self.codigo_sublinea
 
-class Inventario(models.Model):
-    ESTADO_INVENTARIO_CHOICES = (
-        ('PENDIENTE', 'PENDIENTE'),
-        ('EN PROGRESO', 'EN PROGRESO'),
-        ('CERRADO', 'CERRADO'),
-    )
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
-    sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE)
-    fecha_inventario = models.DateTimeField()
-    nro_inventario = models.IntegerField()
-    responsable = models.ForeignKey('Personal', on_delete=models.CASCADE)
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
-    total_inventario = models.DecimalField(max_digits=12, decimal_places=2)
-    estado = models.CharField(max_length=11, choices=ESTADO_INVENTARIO_CHOICES)
-    creado_por = models.CharField(max_length=15)
-    fecha_creacion = models.DateTimeField()
-    def __str__(self):
-        return str(self.nro_inventario)
-
-class Personal(models.Model):
-    TIPO_DOCUMENTO_CHOICES = (
-        ('DNI', 'DNI'),
-        ('Pasaporte', 'Pasaporte'),
-    )
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    nombre_personal = models.CharField(max_length=100)
-    direccion_personal = models.CharField(max_length=150)
-    tipo_documento = models.CharField(max_length=10, choices=TIPO_DOCUMENTO_CHOICES)
-    nro_documento = models.CharField(max_length=11)
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
-    def __str__(self):
-        return self.nombre_personal
-
-    
-class ItemsInventario(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    inventario = models.ForeignKey(Inventario, on_delete=models.CASCADE)
-    nro_item = models.IntegerField()
-    articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE)
-    stock_fisico = models.DecimalField(max_digits=12, decimal_places=2)
-    devoluciones_pendientes = models.DecimalField(max_digits=12, decimal_places=2)
-    total_unidades_stock = models.DecimalField(max_digits=12, decimal_places=2)
-    precio_costo = models.DecimalField(max_digits=12, decimal_places=2)
-    total_item = models.DecimalField(max_digits=12, decimal_places=2)
-
 class UnidadesMedida(models.Model):
     id = models.CharField(primary_key=True, max_length=10)
     unidad_nombre = models.CharField(max_length=150)
