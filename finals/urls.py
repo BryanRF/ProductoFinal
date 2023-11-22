@@ -47,4 +47,14 @@ urlpatterns = [
     path('agregar_usuario/', agregar_usuario, name='agregar_usuario'),
     path('editar_usuario/<int:usuario_id>/', editar_usuario, name='editar_usuario'),
     path('eliminar_usuario/<int:usuario_id>/', eliminar_usuario, name='eliminar_usuario'),
+#----------------------Canal Cliente-------------------
+    path('lista_canales/', lista_canales, name='lista_canales'),
+    path('agregar_canal/', agregar_canal, name='agregar_canal'),
+    path('editar_canal/<uuid:canal_id>/', editar_canal, name='editar_canal'),
+    path('eliminar_canal/<uuid:canal_id>/', eliminar_canal, name='eliminar_canal'),
+#----------------------Clientes-------------------
+    path('lista_clientes/', lista_clientes, name='lista_clientes'),
+    path('agregar_cliente/', agregar_cliente, name='agregar_cliente'),
+    path('editar_cliente/<uuid:cliente_id>/', editar_cliente, name='editar_cliente'),
+    path('eliminar_cliente/<uuid:cliente_id>/', eliminar_cliente, name='eliminar_cliente'),
 ]

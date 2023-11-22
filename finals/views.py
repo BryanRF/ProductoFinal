@@ -1,6 +1,8 @@
 from django.shortcuts import render,redirect,get_object_or_404
+from django.views.decorators.http import require_POST,require_http_methods
 from .models import *
 from .forms import *
+from django.http import JsonResponse
 #----------------------Empresa-------------------
 def lista_empresas(request):
     empresas = Empresa.objects.all()
@@ -281,3 +283,68 @@ def eliminar_usuario(request, usuario_id):
     usuario = get_object_or_404(Usuarios, id=usuario_id)
     usuario.delete()
     return redirect('lista_usuarios')
+
+#----------------------Canal Cliente-------------------
+def lista_canales(request):
+    canales = CanalCliente.objects.all()
+    return render(request, 'canales/lista_canales.html', {'canales': canales})
+
+def agregar_canal(request):
+    if request.method == 'POST':
+        form = CanalClienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_canales')
+    else:
+        form = CanalClienteForm()
+    return render(request, 'canales/agregar_editar_canal.html', {'form': form})
+
+def editar_canal(request, canal_id):
+    canal = get_object_or_404(CanalCliente, id=canal_id)
+
+    if request.method == 'POST':
+        form = CanalClienteForm(request.POST, instance=canal)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_canales')
+    else:
+        form = CanalClienteForm(instance=canal)
+
+    return render(request, 'canales/agregar_editar_canal.html', {'form': form})
+
+def eliminar_canal(request, canal_id):
+    canal = get_object_or_404(CanalCliente, id=canal_id)
+    canal.delete()
+    return redirect('lista_canales')
+#----------------------Clientes-------------------
+def lista_clientes(request):
+    clientes = Clientes.objects.all()
+    return render(request, 'clientes/lista_clientes.html', {'clientes': clientes})
+
+def agregar_cliente(request):
+    if request.method == 'POST':
+        form = ClientesForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_clientes')
+    else:
+        form = ClientesForm()
+    return render(request, 'clientes/agregar_editar_cliente.html', {'form': form})
+
+def editar_cliente(request, cliente_id):
+    cliente = get_object_or_404(Clientes, id=cliente_id)
+
+    if request.method == 'POST':
+        form = ClientesForm(request.POST, instance=cliente)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_clientes')
+    else:
+        form = ClientesForm(instance=cliente)
+
+    return render(request, 'clientes/agregar_editar_cliente.html', {'form': form})
+
+def eliminar_cliente(request, cliente_id):
+    cliente = get_object_or_404(Clientes, id=cliente_id)
+    cliente.delete()
+    return redirect('lista_clientes')

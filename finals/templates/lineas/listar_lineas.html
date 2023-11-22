@@ -20,7 +20,7 @@
                             <tr>
                                 <th scope="col">Código de Línea</th>
                                 <th scope="col">Descripción</th>
-                                <th scope="col">Proveedores</th>
+                                <th scope="col">Codigo de Proveedores</th>
                                 <th scope="col">Responsable de Línea</th>
                                 <th scope="col">Acciones</th>
                             </tr>
@@ -29,9 +29,8 @@
                             {% for linea in lineas %}
                             <tr>
                                 <td>{{ linea.codigo_linea }}</td>
-                                <td>{{ linea.grupo.codigo_grupo}}</td>
                                 <td>{{ linea.linea_descripcion }}</td>
-                                <td>{{ linea.grupo.grupo_descripcion }}</td>
+                                <td>{{ linea.grupo.codigo_grupo }}</td>
                                 <td>{{ linea.responsable_linea }}</td>
                                 <td>
                                     <a href="{% url 'editar_linea' linea.id %}" class="btn btn-sm btn-warning">Editar</a>

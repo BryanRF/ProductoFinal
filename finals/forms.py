@@ -38,7 +38,7 @@ class GruposProveedorForm(forms.ModelForm):
             'codigo_grupo': forms.TextInput(attrs={'class': 'form-control'}),
             'grupo_descripcion': forms.TextInput(attrs={'class': 'form-control'}),
             'empresa': forms.Select(attrs={'class': 'form-control'}),
-            'activo': forms.Select(attrs={'class': 'form-select'},choices=((True, 'Activo'), (False, 'Inactivo'))),
+            'activo': forms.Select(attrs={'class': 'form-select'},choices=((True, 'Activo'), (False, 'Bloqueado'))),
             'responsable_grupo': forms.TextInput(attrs={'class': 'form-control'}),
         }
 #----------------------Marcas-------------------
@@ -106,4 +106,25 @@ class UsuariosForm(forms.ModelForm):
             'full_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'password': forms.PasswordInput(attrs={'class': 'form-control'}),
+        }
+#----------------------Canal Cliente-------------------
+class CanalClienteForm(forms.ModelForm):
+    class Meta:
+        model = CanalCliente
+        fields = ['canal_cliente_descripcion']
+
+        widgets = {
+            'canal_cliente_descripcion': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+#----------------------Clientes-------------------
+class ClientesForm(forms.ModelForm):
+    class Meta:
+        model = Clientes
+        fields = ['nro_documento', 'nombre_razon_social', 'direccion', 'canal_cliente']
+
+        widgets = {
+            'nro_documento': forms.TextInput(attrs={'class': 'form-control'}),
+            'nombre_razon_social': forms.TextInput(attrs={'class': 'form-control'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control'}),
+            'canal_cliente': forms.Select(attrs={'class': 'form-control'}),
         }

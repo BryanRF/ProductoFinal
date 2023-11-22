@@ -36,7 +36,7 @@ class Articulo(models.Model):
 class GruposProveedor(models.Model):
     ESTADO_CHOICES = [
         (True, 'Activo'),
-        (False, 'Inactivo'),
+        (False, 'Bloqueado'),
     ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     codigo_grupo = models.CharField(max_length=15)
@@ -46,19 +46,13 @@ class GruposProveedor(models.Model):
     responsable_grupo = models.CharField(max_length=25)
 
     def __str__(self):
-        return f'{self.codigo_grupo} - {self.grupo_descripcion}'
+        return f'{self.codigo_grupo}'
 
     def estado_activo(self):
         if self.activo:
             return "Activo"
         else:
             return "Inactivo"
-
-    def estado_bloqueado(self):
-        if self.activo:
-            return "Activo"
-        else:
-            return "Bloqueado"
         
 class LineasArticulos(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -101,3 +95,18 @@ class Marcas(models.Model):
     marca_nombre = models.CharField(max_length=150)
     def __str__(self):
         return self.marca_nombre
+
+class CanalCliente(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    canal_cliente_descripcion = models.CharField(max_length=150)
+    def __str__(self):
+        return self.canal_cliente_descripcion
+    
+class Clientes(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nro_documento = models.CharField(max_length=12)
+    nombre_razon_social = models.CharField(max_length=150)
+    direccion = models.CharField(max_length=150)
+    canal_cliente = models.ForeignKey(CanalCliente,on_delete=models.CASCADE)
+    def __str__(self):
+        return self.nro_documento
