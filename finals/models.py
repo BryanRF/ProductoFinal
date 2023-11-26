@@ -110,3 +110,8 @@ class Clientes(models.Model):
     canal_cliente = models.ForeignKey(CanalCliente,on_delete=models.CASCADE)
     def __str__(self):
         return self.nro_documento
+
+class CondicionVentas(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    descripcion = models.CharField(max_length=100)
+    genera_credito = models.CharField(max_length=10)

@@ -348,3 +348,35 @@ def eliminar_cliente(request, cliente_id):
     cliente = get_object_or_404(Clientes, id=cliente_id)
     cliente.delete()
     return redirect('lista_clientes')
+#------------------------Condiciones Venta-----------------
+def lista_condicion_ventas(request):
+    condicion_ventas = CondicionVentas.objects.all()
+    return render(request, 'condicion_ventas/lista_condicion_ventas.html', {'condicion_ventas': condicion_ventas})
+
+def agregar_condicion_venta(request):
+    if request.method == 'POST':
+        form = CondicionVentasForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_condicion_ventas')
+    else:
+        form = CondicionVentasForm()
+    return render(request, 'condicion_ventas/agregar_editar_condicion_venta.html', {'form': form})
+
+def editar_condicion_venta(request, condicion_venta_id):
+    condicion_venta = get_object_or_404(CondicionVentas, id=condicion_venta_id)
+
+    if request.method == 'POST':
+        form = CondicionVentasForm(request.POST, instance=condicion_venta)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_condicion_ventas')
+    else:
+        form = CondicionVentasForm(instance=condicion_venta)
+
+    return render(request, 'condicion_ventas/agregar_editar_condicion_venta.html', {'form': form})
+
+def eliminar_condicion_venta(request, condicion_venta_id):
+    condicion_venta = get_object_or_404(CondicionVentas, id=condicion_venta_id)
+    condicion_venta.delete()
+    return redirect('lista_condicion_ventas')

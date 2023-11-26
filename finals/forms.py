@@ -128,3 +128,12 @@ class ClientesForm(forms.ModelForm):
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
             'canal_cliente': forms.Select(attrs={'class': 'form-control'}),
         }
+#------------------Condicones Venta--------------
+class CondicionVentasForm(forms.ModelForm):
+    class Meta:
+        model = CondicionVentas
+        fields = '__all__'
+        widgets = {
+            'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
+            'genera_credito': forms.TextInput(attrs={'class': 'form-control'}),
+        }
