@@ -87,4 +87,12 @@ urlpatterns = [
     path('agregar_nota_venta/', agregar_nota_venta, name='agregar_nota_venta'),
     path('editar_nota_venta/<uuid:nota_venta_id>/', editar_nota_venta, name='editar_nota_venta'),
     path('eliminar_nota_venta/<uuid:nota_venta_id>/', eliminar_nota_venta, name='eliminar_nota_venta'),
+
+
+#-----------------------ITEM Notas Ventas--------------
+
+path('lista_items_nota_venta/', lista_items_nota_venta, name='lista_items_nota_venta'),
+    path('agregar_item_nota_venta/', agregar_item_nota_venta, name='agregar_item_nota_venta'),
+    path('editar_item_nota_venta/<uuid:item_id>/', editar_item_nota_venta, name='editar_item_nota_venta'),
+    path('eliminar_item_nota_venta/<uuid:item_id>/', eliminar_item_nota_venta, name='eliminar_item_nota_venta'),
 ]

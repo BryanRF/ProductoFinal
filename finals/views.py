@@ -520,3 +520,37 @@ def eliminar_nota_venta(request, nota_venta_id):
     nota_venta = get_object_or_404(NotasVenta, id=nota_venta_id)
     nota_venta.delete()
     return redirect('lista_notas_venta')
+
+
+#-----------------------ITEM Notas Ventas--------------
+def lista_items_nota_venta(request):
+    items_nota_venta = ItemsNotaVenta.objects.all()
+    return render(request, 'item_nota_venta/lista_items_nota_venta.html', {'items_nota_venta': items_nota_venta})
+
+def agregar_item_nota_venta(request):
+    if request.method == 'POST':
+        form = ItemsNotaVentaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_items_nota_venta')
+    else:
+        form = ItemsNotaVentaForm()
+
+    return render(request, 'item_nota_venta/agregar_editar_item_nota_venta.html', {'form': form})
+
+def editar_item_nota_venta(request, item_id):
+    item_nota_venta = get_object_or_404(ItemsNotaVenta, id=item_id)
+    if request.method == 'POST':
+        form = ItemsNotaVentaForm(request.POST, instance=item_nota_venta)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_items_nota_venta')
+    else:
+        form = ItemsNotaVentaForm(instance=item_nota_venta)
+
+    return render(request, 'item_nota_venta/agregar_editar_item_nota_venta.html', {'form': form})
+
+def eliminar_item_nota_venta(request, item_id):
+    item_nota_venta = get_object_or_404(ItemsNotaVenta, id=item_id)
+    item_nota_venta.delete()
+    return redirect('lista_items_nota_venta')

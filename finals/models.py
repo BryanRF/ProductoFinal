@@ -169,3 +169,21 @@ class NotasVenta(models.Model):
     total_pedido = models.DecimalField(max_digits=12, decimal_places=2)
     def __str__(self):
         return self.nro_pedido
+    
+    #-----------ITEM NOtas Vendedor--------------
+
+class ItemsNotaVenta(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nota_venta = models.ForeignKey(NotasVenta, on_delete=models.CASCADE)
+    nro_item = models.IntegerField()
+    articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE)
+    precio_unitario = models.DecimalField(max_digits=12, decimal_places=2)
+    cantidad = models.DecimalField(max_digits=12, decimal_places=2)
+    total_item_bruto = models.DecimalField(max_digits=12, decimal_places=2)
+    factor_descuento = models.DecimalField(max_digits=12, decimal_places=3)
+    descuento_unitario = models.DecimalField(max_digits=12, decimal_places=2)
+    total_item = models.DecimalField(max_digits=12, decimal_places=2)
+    es_bonificacion = models.CharField(max_length=1)
+
+    def __str__(self):
+        return self.nro_item
