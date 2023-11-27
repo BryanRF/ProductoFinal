@@ -115,6 +115,8 @@ class CondicionVentas(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     descripcion = models.CharField(max_length=100)
     genera_credito = models.CharField(max_length=10)
+    def __str__(self):
+        return self.descripcion
 
     #----------------------TipoIdentificacion-------------------
 class TiposIdentificacion(models.Model):
@@ -148,3 +150,22 @@ class Vendedor(models.Model):
 
     def __str__(self):
         return self.nombres
+#-----------NOtas Vendedor--------------
+class NotasVenta(models.Model):
+    TIPO_DOCUMENTO_CHOICES = [
+        ('DNI', 'DNI'),
+        ('Pasaporte', 'Pasaporte'),
+    ]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE)
+    nro_pedido = models.CharField(max_length=25)
+    fecha_pedido = models.DateTimeField()
+    tipo_pedido= models.ForeignKey(TipoPedido, on_delete=models.CASCADE)
+    cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE)
+    condicion_venta = models.ForeignKey(CondicionVentas, on_delete=models.CASCADE)
+    plazo= models.IntegerField()
+    tipo_documento = models.CharField(max_length=10, choices=TIPO_DOCUMENTO_CHOICES)
+    total_pedido = models.DecimalField(max_digits=12, decimal_places=2)
+    def __str__(self):
+        return self.nro_pedido

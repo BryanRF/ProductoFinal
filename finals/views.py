@@ -487,3 +487,36 @@ def eliminar_vendedor(request, vendedor_id):
     vendedor = get_object_or_404(Vendedor, id=vendedor_id)
     vendedor.delete()
     return redirect('listar_vendedores')
+
+#--------------------Notas Ventas-------------------
+def lista_notas_venta(request):
+    notas_venta = NotasVenta.objects.all()
+    return render(request, 'notas_venta/lista_notas_venta.html', {'notas_venta': notas_venta})
+
+def agregar_nota_venta(request):
+    if request.method == 'POST':
+        form = NotasVentaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_notas_venta')
+    else:
+        form = NotasVentaForm()
+    
+    return render(request, 'notas_venta/agregar_editar_nota_venta.html', {'form': form})
+
+def editar_nota_venta(request, nota_venta_id):
+    nota_venta = get_object_or_404(NotasVenta, id=nota_venta_id)
+    if request.method == 'POST':
+        form = NotasVentaForm(request.POST, instance=nota_venta)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_notas_venta')
+    else:
+        form = NotasVentaForm(instance=nota_venta)
+
+    return render(request, 'notas_venta/agregar_editar_nota_venta.html', {'form': form})
+
+def eliminar_nota_venta(request, nota_venta_id):
+    nota_venta = get_object_or_404(NotasVenta, id=nota_venta_id)
+    nota_venta.delete()
+    return redirect('lista_notas_venta')

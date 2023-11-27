@@ -1,0 +1,57 @@
+{% extends 'master.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Notas de Venta</h1>
+        <a href="{% url 'agregar_nota_venta' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">Nueva Nota de Venta</a>
+    </div>
+
+    <!-- Content Row -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Lista</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nro. Pedido</th>
+                            <th scope="col">Fecha Pedido</th>
+                            <th scope="col">Tipo Pedido</th>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Condición Venta</th>
+                            <th scope="col">Plazo</th>
+                            <th scope="col">Tipo Documento</th>
+                            <th scope="col">Total Pedido</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for nota_venta in notas_venta %}
+                        <tr>
+                            <td>{{ nota_venta.nro_pedido }}</td>
+                            <td>{{ nota_venta.fecha_pedido }}</td>
+                            <td>{{ nota_venta.tipo_pedido.tipo_pedido_nombre }}</td>
+                            <td>{{ nota_venta.cliente.nro_documento }}</td>
+                            <td>{{ nota_venta.condicion_venta.descripcion }}</td>
+                            <td>{{ nota_venta.plazo }}</td>
+                            <td>{{ nota_venta.get_tipo_documento_display }}</td>
+                            <td>{{ nota_venta.total_pedido }}</td>
+                            <td>
+                                <a href="{% url 'editar_nota_venta' nota_venta.id %}" class="btn btn-sm btn-warning">Editar</a>
+                                <a href="{% url 'eliminar_nota_venta' nota_venta.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

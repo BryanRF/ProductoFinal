@@ -71,24 +71,20 @@ urlpatterns = [
     path('eliminar_tipo_identificacion/<uuid:tipo_identificacion_id>/', eliminar_tipo_identificacion, name='eliminar_tipo_identificacion'),
 
 #----------------------TipoPedido-------------------
-
-
-
-
-    # Tipos de Pedido
     path('listar_tipos_pedido/', listar_tipos_pedido, name='listar_tipos_pedido'),
     path('agregar_tipo_pedido/', agregar_tipo_pedido, name='agregar_tipo_pedido'),
     path('editar_tipo_pedido/<uuid:tipo_pedido_id>/', editar_tipo_pedido, name='editar_tipo_pedido'),
     path('eliminar_tipo_pedido/<uuid:tipo_pedido_id>/', eliminar_tipo_pedido, name='eliminar_tipo_pedido'),
 
-  
-
-
 #----------------------Vendedores-------------------
-
-
     path('listar_vendedores/', listar_vendedores, name='listar_vendedores'),
     path('agregar_vendedor/', agregar_vendedor, name='agregar_vendedor'),
     path('editar_vendedor/<uuid:vendedor_id>/', editar_vendedor, name='editar_vendedor'),
     path('eliminar_vendedor/<uuid:vendedor_id>/', eliminar_vendedor, name='eliminar_vendedor'),
+
+#-----------------------Notas Ventas--------------
+    path('lista_notas_venta/', lista_notas_venta, name='lista_notas_venta'),
+    path('agregar_nota_venta/', agregar_nota_venta, name='agregar_nota_venta'),
+    path('editar_nota_venta/<uuid:nota_venta_id>/', editar_nota_venta, name='editar_nota_venta'),
+    path('eliminar_nota_venta/<uuid:nota_venta_id>/', eliminar_nota_venta, name='eliminar_nota_venta'),
 ]

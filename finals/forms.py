@@ -171,3 +171,19 @@ class VendedorForm(forms.ModelForm):
             'nro_movil': forms.TextInput(attrs={'class': 'form-control'}),
             'empresa': forms.Select(attrs={'class': 'form-control'}),
         }
+#----------------------Notas Ventas-------------
+class NotasVentaForm(forms.ModelForm):
+    class Meta:
+        model = NotasVenta
+        fields = '__all__'
+        widgets = {
+            'fecha_pedido': forms.TextInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
+            'empresa': forms.Select(attrs={'class': 'form-select'}),
+            'sucursal': forms.Select(attrs={'class': 'form-select'}),
+            'tipo_pedido': forms.Select(attrs={'class': 'form-select'}),
+            'cliente': forms.Select(attrs={'class': 'form-select'}),
+            'condicion_venta': forms.Select(attrs={'class': 'form-select'}),
+            'plazo': forms.NumberInput(attrs={'class': 'form-control'}),
+            'total_pedido': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
