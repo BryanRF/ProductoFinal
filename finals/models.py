@@ -115,3 +115,36 @@ class CondicionVentas(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     descripcion = models.CharField(max_length=100)
     genera_credito = models.CharField(max_length=10)
+
+    #----------------------TipoIdentificacion-------------------
+class TiposIdentificacion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tipo_identificacion_nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.tipo_identificacion_nombre
+    
+    
+#----------------------TIPOPedido-------------------
+
+class TipoPedido(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tipo_pedido_nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.tipo_pedido_nombre
+#----------------------Vendedores-------------------
+
+class Vendedor(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    vendedor_codigo = models.CharField(max_length=15)
+    tipo_identificacion = models.ForeignKey(TiposIdentificacion, on_delete=models.CASCADE)
+    nro_documento = models.CharField(max_length=11)
+    nombres = models.CharField(max_length=150)
+    direccion = models.CharField(max_length=150)
+    correo_electronico = models.CharField(max_length=255)
+    nro_movil = models.CharField(max_length=15)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.nombres

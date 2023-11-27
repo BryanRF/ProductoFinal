@@ -137,3 +137,37 @@ class CondicionVentasForm(forms.ModelForm):
             'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
             'genera_credito': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+#----------------------TipoIdentificacion-------------------
+
+class TiposIdentificacionForm(forms.ModelForm):
+    class Meta:
+        model = TiposIdentificacion
+        fields = ['tipo_identificacion_nombre']
+#----------------------TipoPedido-------------------
+
+class TipoPedidoForm(forms.ModelForm):
+    class Meta:
+        model = TipoPedido
+        fields = ['tipo_pedido_nombre']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class': 'form-control'})
+
+#----------------------Vendedores-------------------
+class VendedorForm(forms.ModelForm):
+    class Meta:
+        model = Vendedor
+        fields = '__all__'
+        widgets = {
+            'nombres': forms.TextInput(attrs={'class': 'form-control'}),
+            'vendedor_codigo': forms.TextInput(attrs={'class': 'form-control'}),
+            'tipo_identificacion': forms.Select(attrs={'class': 'form-select'}),
+            'nro_documento': forms.TextInput(attrs={'class': 'form-control'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control'}),
+            'correo_electronico': forms.EmailInput(attrs={'class': 'form-control'}),
+            'nro_movil': forms.TextInput(attrs={'class': 'form-control'}),
+            'empresa': forms.Select(attrs={'class': 'form-control'}),
+        }

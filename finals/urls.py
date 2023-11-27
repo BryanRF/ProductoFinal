@@ -62,4 +62,33 @@ urlpatterns = [
     path('agregar_condicion_venta/', agregar_condicion_venta, name='agregar_condicion_venta'),
     path('editar_condicion_venta/<uuid:condicion_venta_id>/', editar_condicion_venta, name='editar_condicion_venta'),
     path('eliminar_condicion_venta/<uuid:condicion_venta_id>/', eliminar_condicion_venta, name='eliminar_condicion_venta'),
+
+#----------------------TipoIdentificacion-------------------
+
+    path('listar_tipos_identificacion/', listar_tipos_identificacion, name='listar_tipos_identificacion'),
+    path('agregar_tipo_identificacion/', agregar_tipo_identificacion, name='agregar_tipo_identificacion'),
+    path('editar_tipo_identificacion/<uuid:tipo_identificacion_id>/', editar_tipo_identificacion, name='editar_tipo_identificacion'),
+    path('eliminar_tipo_identificacion/<uuid:tipo_identificacion_id>/', eliminar_tipo_identificacion, name='eliminar_tipo_identificacion'),
+
+#----------------------TipoPedido-------------------
+
+
+
+
+    # Tipos de Pedido
+    path('listar_tipos_pedido/', listar_tipos_pedido, name='listar_tipos_pedido'),
+    path('agregar_tipo_pedido/', agregar_tipo_pedido, name='agregar_tipo_pedido'),
+    path('editar_tipo_pedido/<uuid:tipo_pedido_id>/', editar_tipo_pedido, name='editar_tipo_pedido'),
+    path('eliminar_tipo_pedido/<uuid:tipo_pedido_id>/', eliminar_tipo_pedido, name='eliminar_tipo_pedido'),
+
+  
+
+
+#----------------------Vendedores-------------------
+
+
+    path('listar_vendedores/', listar_vendedores, name='listar_vendedores'),
+    path('agregar_vendedor/', agregar_vendedor, name='agregar_vendedor'),
+    path('editar_vendedor/<uuid:vendedor_id>/', editar_vendedor, name='editar_vendedor'),
+    path('eliminar_vendedor/<uuid:vendedor_id>/', eliminar_vendedor, name='eliminar_vendedor'),
 ]

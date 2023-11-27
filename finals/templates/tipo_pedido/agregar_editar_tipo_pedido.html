@@ -1,0 +1,28 @@
+{% extends 'master.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Tipos de Pedido</h1>
+            <a href="{% url 'listar_tipos_pedido' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">Mostrar Lista</a>
+        </div>
+
+        <!-- Content Row -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Agregar</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

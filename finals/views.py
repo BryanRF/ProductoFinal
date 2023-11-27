@@ -380,3 +380,110 @@ def eliminar_condicion_venta(request, condicion_venta_id):
     condicion_venta = get_object_or_404(CondicionVentas, id=condicion_venta_id)
     condicion_venta.delete()
     return redirect('lista_condicion_ventas')
+
+
+#----------------------TipoIdentificacion-------------------
+
+def listar_tipos_identificacion(request):
+    tipos_identificacion = TiposIdentificacion.objects.all()
+    return render(request, 'tipos_identificacion/listar_tipos_identificacion.html', {'tipos_identificacion': tipos_identificacion})
+
+def agregar_tipo_identificacion(request):
+    if request.method == 'POST':
+        form = TiposIdentificacionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_tipos_identificacion')
+    else:
+        form = TiposIdentificacionForm()
+
+    return render(request, 'tipos_identificacion/agregar_editar_tipos_identificacion.html', {'form': form})
+
+def editar_tipo_identificacion(request, tipo_identificacion_id):
+    tipo_identificacion = get_object_or_404(TiposIdentificacion, id=tipo_identificacion_id)
+    if request.method == 'POST':
+        form = TiposIdentificacionForm(request.POST, instance=tipo_identificacion)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_tipos_identificacion')
+    else:
+        form = TiposIdentificacionForm(instance=tipo_identificacion)
+
+    return render(request, 'tipos_identificacion/agregar_editar_tipos_identificacion.html', {'form': form})
+
+def eliminar_tipo_identificacion(request, tipo_identificacion_id):
+    tipo_identificacion = get_object_or_404(TiposIdentificacion, id=tipo_identificacion_id)
+    tipo_identificacion.delete()
+    return redirect('listar_tipos_identificacion')
+
+#----------------------TipoPedido-------------------
+
+
+# Lista de tipos de pedidos
+def listar_tipos_pedido(request):
+    tipos_pedido = TipoPedido.objects.all()
+    return render(request, 'tipo_pedido/listar_tipos_pedido.html', {'tipo_pedido': tipos_pedido})
+
+# Agregar un nuevo tipo de pedido
+def agregar_tipo_pedido(request):
+    if request.method == 'POST':
+        form = TipoPedidoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_tipos_pedido')
+    else:
+        form = TipoPedidoForm()
+    return render(request, 'tipo_pedido/agregar_editar_tipo_pedido.html', {'form': form})
+
+# Editar un tipo de pedido existente
+def editar_tipo_pedido(request, tipo_pedido_id):
+    tipo_pedido = get_object_or_404(TipoPedido, id=tipo_pedido_id)
+    if request.method == 'POST':
+        form = TipoPedidoForm(request.POST, instance=tipo_pedido)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_tipos_pedido')
+    else:
+        form = TipoPedidoForm(instance=tipo_pedido)
+
+    return render(request, 'tipo_pedido/agregar_editar_tipo_pedido.html', {'form': form, 'tipo_pedido': tipo_pedido})
+
+# Eliminar un tipo de pedido existente
+def eliminar_tipo_pedido(request, tipo_pedido_id):
+    tipo_pedido = get_object_or_404(TipoPedido, id=tipo_pedido_id)
+    tipo_pedido.delete()
+    return redirect('listar_tipos_pedido')
+
+
+#----------------------Vendedores-------------------
+
+def listar_vendedores(request):
+    vendedores = Vendedor.objects.all()
+    return render(request, 'vendedor/listar_vendedores.html', {'vendedores': vendedores})
+
+def agregar_vendedor(request):
+    if request.method == 'POST':
+        form = VendedorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_vendedores')
+    else:
+        form = VendedorForm()
+    return render(request, 'vendedor/agregar_editar_vendedor.html', {'form': form})
+
+def editar_vendedor(request, vendedor_id):
+    vendedor = get_object_or_404(Vendedor, id=vendedor_id)
+    if request.method == 'POST':
+        form = VendedorForm(request.POST, instance=vendedor)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_vendedores')
+    else:
+        form = VendedorForm(instance=vendedor)
+
+    return render(request, 'vendedor/agregar_editar_vendedor.html', {'form': form})
+
+def eliminar_vendedor(request, vendedor_id):
+    vendedor = get_object_or_404(Vendedor, id=vendedor_id)
+    vendedor.delete()
+    return redirect('listar_vendedores')
