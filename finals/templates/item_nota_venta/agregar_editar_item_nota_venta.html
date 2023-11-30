@@ -16,13 +16,67 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <form method="post">
+                    <form  id="notaVentaForm">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-primary guardar">Guardar</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+         document.querySelector('.guardar').addEventListener('click', function () {
+            event.preventDefault();
+
+            // Obtener los datos del formulario
+            var formData = new FormData(document.getElementById('notaVentaForm'));
+
+            // Realizar la solicitud Fetch al API
+            fetch('/api/items-nota-venta/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                    const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                    });
+                    Toast.fire({
+                    icon: "success",
+                    title: data.message
+                    });
+                console.log(data.message);
+            })
+            .catch(error => {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                    });
+                    Toast.fire({
+                    icon: "error",
+                    title: error
+                    });
+                console.error('Error:', error);
+            });
+        });
+    </script>
 {% endblock %}

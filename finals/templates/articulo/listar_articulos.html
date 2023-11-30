@@ -19,6 +19,7 @@
                     <thead>
                     <tr>
                         <th scope="col">Código SKU</th>
+                        <th scope="col">Precio</th>
                         <th scope="col">Descripción</th>
                         <th scope="col">Unidad de Medida</th>
                         <th scope="col">Grupo</th>
@@ -35,6 +36,7 @@
                     {% for articulo in articulos %}
                         <tr>
                         <td>{{ articulo.codigo_sku }}</td>
+                        <td>{{ articulo.precio_unitario }}</td>
                         <td>{{ articulo.descripcion }}</td>
                         <td>{{ articulo.unidad_medida }}</td>
                         <td>{{ articulo.grupo }}</td>

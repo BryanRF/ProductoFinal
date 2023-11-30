@@ -25,13 +25,14 @@ class Articulo(models.Model):
     unidad_medida = models.ForeignKey('UnidadesMedida', on_delete=models.CASCADE)
     grupo = models.ForeignKey('GruposProveedor', on_delete=models.CASCADE)
     linea = models.ForeignKey('LineasArticulos', on_delete=models.CASCADE)
+    precio_unitario = models.DecimalField(max_digits=12, decimal_places=2,default=0)
     sublinea = models.ForeignKey('SublineasArticulos', on_delete=models.CASCADE)
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
     factor_compra = models.IntegerField()
     factor_reparto = models.IntegerField()
     marca = models.ForeignKey('Marcas', on_delete=models.CASCADE)
     def __str__(self):
-        return self.codigo_sku
+        return f"{self.codigo_sku}  - {self.descripcion} - s/. {self.precio_unitario}"
 
 class GruposProveedor(models.Model):
     ESTADO_CHOICES = [
@@ -175,15 +176,30 @@ class NotasVenta(models.Model):
 class ItemsNotaVenta(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nota_venta = models.ForeignKey(NotasVenta, on_delete=models.CASCADE)
-    nro_item = models.IntegerField()
+    nro_item = models.IntegerField(default=0)
+    descripcion = models.JSONField(null=True)
     articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE)
-    precio_unitario = models.DecimalField(max_digits=12, decimal_places=2)
     cantidad = models.DecimalField(max_digits=12, decimal_places=2)
-    total_item_bruto = models.DecimalField(max_digits=12, decimal_places=2)
-    factor_descuento = models.DecimalField(max_digits=12, decimal_places=3)
-    descuento_unitario = models.DecimalField(max_digits=12, decimal_places=2)
-    total_item = models.DecimalField(max_digits=12, decimal_places=2)
-    es_bonificacion = models.CharField(max_length=1)
-
+    total_item_bruto = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
+    factor_descuento = models.DecimalField(max_digits=12, decimal_places=3 , default=0)
+    descuento_unitario = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
+    total_item = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
+    es_bonificacion = models.CharField(max_length=1 , default=0)
+    def calcular_total_item(self):
+        # Calcula el total_item automáticamente
+        self.total_item_bruto = (self.articulo.precio_unitario) * self.cantidad
+        # 
+        self.total_item = (self.articulo.precio_unitario * self.descuento_unitario / 100) * self.cantidad
+    def save(self, *args, **kwargs):
+        # Llama al método de cálculo al guardar el objeto
+        self.calcular_total_item()
+        # Si es un nuevo ítem y tiene una nota_venta asociada, incrementa el contador
+        if not self.nro_item and self.nota_venta:
+            ultimo_item = ItemsNotaVenta.objects.filter(nota_venta=self.nota_venta).order_by('-nro_item').first()
+            if ultimo_item:
+                self.nro_item = ultimo_item.nro_item + 1
+            else:
+                self.nro_item = 1
+        super().save(*args, **kwargs)
     def __str__(self):
-        return self.nro_item
+        return f"{self.nro_item} - Total: {self.total_item}"

@@ -5,4 +5,5 @@ urlpatterns = [
     path('', views.home_view, name='home'),
     path('admin/', admin.site.urls),
     path("finals/", include("finals.urls")),
+    path("api/", include("finals.urls_apis")),
 ]

@@ -15,9 +15,10 @@ class EmpresaForm(forms.ModelForm):
 class ArticuloForm(forms.ModelForm):
     class Meta:
         model = Articulo
-        fields = ['codigo_sku', 'descripcion', 'unidad_medida', 'grupo', 'linea', 'sublinea', 'empresa', 'factor_compra', 'factor_reparto', 'marca']
+        fields = ['codigo_sku', 'precio_unitario', 'descripcion', 'unidad_medida', 'grupo', 'linea', 'sublinea', 'empresa', 'factor_compra', 'factor_reparto', 'marca']
         widgets = {
             'codigo_sku': forms.TextInput(attrs={'class': 'form-control'}),
+            'precio_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
             'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
             'unidad_medida': forms.Select(attrs={'class': 'form-control'}),
             'grupo': forms.Select(attrs={'class': 'form-control'}),
@@ -194,17 +195,16 @@ class NotasVentaForm(forms.ModelForm):
 class ItemsNotaVentaForm(forms.ModelForm):
     class Meta:
         model = ItemsNotaVenta
-        fields = ['nota_venta', 'nro_item', 'articulo', 'precio_unitario', 'cantidad', 'total_item_bruto', 'factor_descuento', 'descuento_unitario', 'total_item', 'es_bonificacion']
+        fields = ['nota_venta', 'articulo', 'cantidad']
 
         widgets = {
             'nota_venta': forms.Select(attrs={'class': 'form-select'}),
-            'nro_item': forms.NumberInput(attrs={'class': 'form-control'}),
+            # 'nro_item': forms.NumberInput(attrs={'class': 'form-control'}),
             'articulo': forms.Select(attrs={'class': 'form-select'}),
-            'precio_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
+            # 'precio_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
-            'total_item_bruto': forms.NumberInput(attrs={'class': 'form-control'}),
-            'factor_descuento': forms.NumberInput(attrs={'class': 'form-control'}),
-            'descuento_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
-            'total_item': forms.NumberInput(attrs={'class': 'form-control'}),
-            'es_bonificacion': forms.TextInput(attrs={'class': 'form-control'}),
+            # 'total_item_bruto': forms.NumberInput(attrs={'class': 'form-control'}),
+            # 'factor_descuento': forms.NumberInput(attrs={'class': 'form-control'}),
+            # 'descuento_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
+            # 'total_item': forms.NumberInput(attrs={'class': 'form-control'}),
         }

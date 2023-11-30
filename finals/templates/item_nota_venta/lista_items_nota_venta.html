@@ -28,7 +28,7 @@
                             <th scope="col">Factor Descuento</th>
                             <th scope="col">Descuento Unitario</th>
                             <th scope="col">Total Item</th>
-                            <th scope="col">Es Bonificación</th>
+                            <th scope="col">Descripcion Bonificación</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
@@ -37,13 +37,14 @@
                         <tr>
                             <td>{{ item_nota_venta.nro_item }}</td>
                             <td>{{ item_nota_venta.articulo.codigo_sku }}</td>
-                            <td>{{ item_nota_venta.precio_unitario }}</td>
+                            <td>{{ item_nota_venta.articulo.precio_unitario }}</td>
                             <td>{{ item_nota_venta.cantidad }}</td>
                             <td>{{ item_nota_venta.total_item_bruto }}</td>
                             <td>{{ item_nota_venta.factor_descuento }}</td>
                             <td>{{ item_nota_venta.descuento_unitario }}</td>
                             <td>{{ item_nota_venta.total_item }}</td>
-                            <td>{{ item_nota_venta.es_bonificacion }}</td>
+                            <td>{{ item_nota_venta.descripcion|default:'Sin Bonificacion' }}</td>
+
                             <td>
                                 <a href="{% url 'editar_item_nota_venta' item_nota_venta.id %}" class="btn btn-sm btn-warning">Editar</a>
                                 <a href="{% url 'eliminar_item_nota_venta' item_nota_venta.id %}" class="btn btn-sm btn-danger">Eliminar</a>
