@@ -187,9 +187,10 @@ class ItemsNotaVenta(models.Model):
     es_bonificacion = models.CharField(max_length=1 , default=0)
     def calcular_total_item(self):
         # Calcula el total_item automáticamente
+        # total_item_bruto = 20  = 10*2
         self.total_item_bruto = (self.articulo.precio_unitario) * self.cantidad
-        # 
-        self.total_item = (self.articulo.precio_unitario * self.descuento_unitario / 100) * self.cantidad
+        descuento = (self.articulo.precio_unitario * self.descuento_unitario) / 100
+        self.total_item = (self.articulo.precio_unitario - descuento) * self.cantidad
     def save(self, *args, **kwargs):
         # Llama al método de cálculo al guardar el objeto
         self.calcular_total_item()

@@ -32,8 +32,8 @@
                             <td>{{ usuario.full_name }}</td>
                             <td>{{ usuario.email }}</td>
                             <td>
-                                <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-sm btn-warning">Editar</a>
-                                <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
+                                <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
                         {% endfor %}

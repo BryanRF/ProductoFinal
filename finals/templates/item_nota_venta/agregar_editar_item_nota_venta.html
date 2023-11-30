@@ -1,82 +1,99 @@
-{% extends 'master.html' %}
-{% load static %}
+{% extends 'master.html' %} {% load static %} {% block content %}
+<div class="container-fluid">
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">ITEMS Notas de Venta</h1>
+    <a
+      href="{% url 'lista_items_nota_venta' %}"
+      class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+      >Mostrar Lista</a
+    >
+  </div>
 
-{% block content %}
-    <div class="container-fluid">
-        <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">ITEMS Notas de Venta</h1>
-            <a href="{% url 'lista_items_nota_venta' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">Mostrar Lista</a>
-        </div>
-
-        <!-- Content Row -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Agregar ITEM Nota de Venta</h6>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <form  id="notaVentaForm">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="button" class="btn btn-primary guardar">Guardar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+  <!-- Content Row -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">
+        Agregar ITEM Nota de Venta
+      </h6>
     </div>
-    <script>
-         document.querySelector('.guardar').addEventListener('click', function () {
-            event.preventDefault();
+    <div class="card-body">
+      <div class="table-responsive">
+        <form id="notaVentaForm">
+          {% csrf_token %} {{ form.as_p }}
+          <button type="button" class="btn btn-primary guardar">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.querySelector(".guardar").addEventListener("click", function () {
+    event.preventDefault();
 
-            // Obtener los datos del formulario
-            var formData = new FormData(document.getElementById('notaVentaForm'));
+    // Obtener los datos del formulario
+    var formData = new FormData(document.getElementById("notaVentaForm"));
 
-            // Realizar la solicitud Fetch al API
-            fetch('/api/items-nota-venta/', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                    const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                    });
-                    Toast.fire({
-                    icon: "success",
-                    title: data.message
-                    });
-                console.log(data.message);
-            })
-            .catch(error => {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                    });
-                    Toast.fire({
-                    icon: "error",
-                    title: error
-                    });
-                console.error('Error:', error);
-            });
+    // Realizar la solicitud Fetch al API
+    fetch("/api/items-nota-venta/", {
+      method: "POST",
+      body: formData,
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data.message) && data.status==1) {
+          // Si hay más de un mensaje en la lista, mostrar los mensajes con SweetAlert
+          const bonificacionesList = data.message.join("\n");
+          Swal.fire({
+            icon: "success",
+            title: "Bonificaciones registradas",
+            text: bonificacionesList,
+            showCancelButton: true,
+            confirmButtonText: "Seguir registrando",
+            cancelButtonText: "Regresar a la lista",
+          }).then((result) => {
+            if (result.isConfirmed) { document.getElementById("notaVentaForm").reset();
+            } else {
+              window.location.href = "{% url 'lista_items_nota_venta' %}";
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: "success",
+            title: "Éxito",
+            text: data.message[0], // Tomar el primer mensaje si es una lista
+            showCancelButton: true,
+            confirmButtonText: "Seguir registrando",
+            cancelButtonText: "Regresar a la lista",
+        }).then((result) => {
+            if (result.isConfirmed) { document.getElementById("notaVentaForm").reset();
+            } else {
+              window.location.href = "{% url 'lista_items_nota_venta' %}";
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
         });
-    </script>
+        Toast.fire({
+          icon: "error",
+          title: error,
+        });
+        console.error("Error:", error);
+      });
+  });
+</script>
 {% endblock %}

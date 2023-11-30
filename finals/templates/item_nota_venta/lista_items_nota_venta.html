@@ -29,6 +29,7 @@
                             <th scope="col">Descuento Unitario</th>
                             <th scope="col">Total Item</th>
                             <th scope="col">Descripcion Bonificación</th>
+                            <th scope="col">Es Bonificacion</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
@@ -43,11 +44,19 @@
                             <td>{{ item_nota_venta.factor_descuento }}</td>
                             <td>{{ item_nota_venta.descuento_unitario }}</td>
                             <td>{{ item_nota_venta.total_item }}</td>
-                            <td>{{ item_nota_venta.descripcion|default:'Sin Bonificacion' }}</td>
+                            <td>{{ item_nota_venta.descripcion|default:'- -' }}</td>
+                            <td>
+                                {% if item_nota_venta.es_bonificacion %}
+                                    <span class="badge bg-success text-white">Sí</span>
+                                {% else %}
+                                    <span class="badge bg-danger text-white">No</span>
+                                {% endif %}
+                            </td>
+                            
 
                             <td>
-                                <a href="{% url 'editar_item_nota_venta' item_nota_venta.id %}" class="btn btn-sm btn-warning">Editar</a>
-                                <a href="{% url 'eliminar_item_nota_venta' item_nota_venta.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                <a href="{% url 'editar_item_nota_venta' item_nota_venta.id %}" class="btn btn-sm "><i class="bi bi-pencil-square"></i></a>
+                                <a href="{% url 'eliminar_item_nota_venta' item_nota_venta.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
                                 <!-- Agrega cualquier enlace adicional que necesites aquí -->
                             </td>
                         </tr>

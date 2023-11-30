@@ -36,8 +36,8 @@
                             <td>{{ grupo.estado_activo }}</td>
                             <td>{{ grupo.responsable_grupo }}</td>
                             <td>
-                                <a href="{% url 'editar_grupo_proveedor' grupo.id %}" class="btn btn-sm btn-warning">Editar</a>
-                                <a href="{% url 'eliminar_grupo_proveedor' grupo.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                <a href="{% url 'editar_grupo_proveedor' grupo.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
+                                <a href="{% url 'eliminar_grupo_proveedor' grupo.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
                         {% endfor %}

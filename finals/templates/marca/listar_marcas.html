@@ -31,8 +31,8 @@
                             <td>{{ marca.codigo_marca }}</td>
                             <td>{{ marca.marca_nombre }}</td>
                             <td>
-                                <a href="{% url 'editar_marca' marca.id %}" class="btn btn-sm btn-warning">Editar</a>
-                                <a href="{% url 'eliminar_marca' marca.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                <a href="{% url 'editar_marca' marca.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
+                                <a href="{% url 'eliminar_marca' marca.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
                         {% endfor %}
