@@ -17,6 +17,9 @@ class Sucursal(models.Model):
     direccion = models.CharField(max_length=150)
     def __str__(self):
         return self.nombre_comercial 
+    
+
+#----------------------Articulo-------------------
 
 class Articulo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -204,3 +207,30 @@ class ItemsNotaVenta(models.Model):
         super().save(*args, **kwargs)
     def __str__(self):
         return f"{self.nro_item} - Total: {self.total_item}"
+    
+
+    #-----------PROMOCIONES-------------
+class Promocion(models.Model):
+
+    ESTADO_CHOICES = [
+        (True, 'Activo'),
+        (False, 'Bloqueado'),
+    ]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    descripcion = models.CharField(max_length=100)
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField()
+    activo = models.BooleanField()
+    tipo_cliente = models.ForeignKey(CanalCliente, on_delete=models.CASCADE, related_name='promociones')
+    linea = models.ForeignKey(LineasArticulos, on_delete=models.CASCADE, related_name='promociones')
+    sublinea = models.ForeignKey(SublineasArticulos, on_delete=models.CASCADE, related_name='promociones')
+    codigo_sku = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='promociones', null=True, blank=True)
+    cantidad = models.PositiveIntegerField(default=0)
+
+    def estado_activo(self):
+        if self.activo:
+            return "Activo"
+        else:
+            return "Inactivo"
+    def __str__(self):
+        return self.descripcion

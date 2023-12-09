@@ -208,3 +208,22 @@ class ItemsNotaVentaForm(forms.ModelForm):
             # 'descuento_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
             # 'total_item': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+#----------------------PROMOCIONES-------------
+class PromocionForm(forms.ModelForm):
+    descripcion_articulo = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
+
+    class Meta:
+        model = Promocion
+        fields = '__all__'
+        widgets = {
+            'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
+            'fecha_inicio': forms.TextInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'fecha_fin': forms.TextInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'activo': forms.Select(attrs={'class': 'form-select'},choices=((True, 'Activo'), (False, 'Bloqueado'))),
+            'tipo_cliente': forms.Select(attrs={'class': 'form-select'}),
+            'linea': forms.Select(attrs={'class': 'form-select'}),
+            'sublinea': forms.Select(attrs={'class': 'form-select'}),
+            'codigo_sku': forms.Select(attrs={'class': 'form-select', 'id': 'id_codigo_sku'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
