@@ -554,3 +554,47 @@ def eliminar_item_nota_venta(request, item_id):
     item_nota_venta = get_object_or_404(ItemsNotaVenta, id=item_id)
     item_nota_venta.delete()
     return redirect('lista_items_nota_venta')
+
+
+
+#-----------PROMOCIONES-------------
+
+def lista_promociones(request):
+    promociones = Promocion.objects.all()
+    return render(request, 'promocion/lista_promociones.html', {'promociones': promociones})
+
+# Vista para agregar una nueva promoción
+def agregar_promocion(request):
+    articulos = Articulo.objects.all()  # Obtén todos los artículos
+    if request.method == 'POST':
+        form = PromocionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_promociones')
+    else:
+        form = PromocionForm()
+
+    return render(request, 'promocion/agregar_editar_promocion.html', {'form': form, 'articulos': articulos})
+
+# Vista para editar una promoción existente
+def editar_promocion(request, promocion_id):
+    promocion = get_object_or_404(Promocion, id=promocion_id)
+    if request.method == 'POST':
+        form = PromocionForm(request.POST, instance=promocion)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_promociones')
+    else:
+        form = PromocionForm(instance=promocion)
+
+    return render(request, 'promocion/agregar_editar_promocion.html', {'form': form})
+
+# Vista para eliminar una promoción
+def eliminar_promocion(request, promocion_id):
+    promocion = get_object_or_404(Promocion, id=promocion_id)
+    promocion.delete()
+    return redirect('lista_promociones')
+
+
+
+

@@ -1,0 +1,113 @@
+{% extends 'master.html' %}
+{% load static %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+{% block content %}
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Promociones</h1>
+            <a href="{% url 'lista_promociones' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">Mostrar Lista</a>
+        </div>
+
+        <!-- Content Row -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Agregar Promoción</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Campos del formulario que deseas mostrar -->
+                        <div class="mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}">Descripción:</label>
+                            {{ form.descripcion }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.fecha_inicio.id_for_label }}">Fecha de Inicio:</label>
+                            {{ form.fecha_inicio }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.fecha_fin.id_for_label }}">Fecha de Fin:</label>
+                            {{ form.fecha_fin }}
+                        </div>
+                        <div class="mb-3 form-check">
+                            {{ form.activo }} 
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.tipo_cliente.id_for_label }}">Tipo Cliente:</label>
+                            {{ form.tipo_cliente }}
+                        </div>
+                       
+
+                        <div class="mb-3">
+                            <label for="{{ form.linea.id_for_label }}">Linea:</label>
+                            {{ form.linea }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.sublinea.id_for_label }}">Sublinea:</label>
+                            {{ form.sublinea }}
+                        </div>
+                        
+
+                        <!-- Nuevo contenido para mostrar Condiciones -->
+                        <div class="mt-4">
+                            <h5 class="mb-3">Condiciones</h5>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Código SKU</th>
+                                        
+                                        <th scope="col">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Puedes iterar sobre las condiciones si hay múltiples -->
+                                    <tr>
+                                        <td>{{ form.codigo_sku }}</td>
+                                        <td>{{ form.cantidad }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Fin del nuevo contenido -->
+
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Obtén referencias a los elementos del formulario
+            const codigoSkuSelect = document.getElementById('id_codigo_sku');
+            const descripcionCondicionInput = document.getElementById('id_descripcion_condicion');
+
+            // Agrega un evento de cambio al campo de selección de código SKU
+            codigoSkuSelect.addEventListener('change', function () {
+                // Obtén la descripción del producto seleccionado
+                const descripcionProducto = obtenerDescripcionProducto(codigoSkuSelect.value);
+
+                // Asigna la descripción al campo de entrada
+                descripcionCondicionInput.value = descripcionProducto;
+            });
+
+            // Función para obtener la descripción del producto
+            function obtenerDescripcionProducto(codigoSku) {
+                // Realiza una solicitud AJAX o utiliza otra lógica para obtener la descripción
+                // Puedes modificar esto según cómo esté estructurada tu aplicación
+                // Por ahora, solo devolvemos un valor de ejemplo
+                return "Descripción del producto para " + codigoSku;
+            }
+        });
+    </script>
+{% endblock %}
+
+
+

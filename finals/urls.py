@@ -95,4 +95,14 @@ path('lista_items_nota_venta/', lista_items_nota_venta, name='lista_items_nota_v
     path('agregar_item_nota_venta/', agregar_item_nota_venta, name='agregar_item_nota_venta'),
     path('editar_item_nota_venta/<uuid:item_id>/', editar_item_nota_venta, name='editar_item_nota_venta'),
     path('eliminar_item_nota_venta/<uuid:item_id>/', eliminar_item_nota_venta, name='eliminar_item_nota_venta'),
+
+
+
+    # ---------------------- Promociones -------------------
+    path('lista_promociones/', lista_promociones, name='lista_promociones'),
+    path('agregar_promocion/', agregar_promocion, name='agregar_promocion'),
+    path('editar_promocion/<uuid:promocion_id>/', editar_promocion, name='editar_promocion'),
+    path('eliminar_promocion/<uuid:promocion_id>/', eliminar_promocion, name='eliminar_promocion'),
+    
+    
 ]
