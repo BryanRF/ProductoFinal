@@ -40,43 +40,58 @@
                             <label for="{{ form.tipo_cliente.id_for_label }}">Tipo Cliente:</label>
                             {{ form.tipo_cliente }}
                         </div>
-                       
-
                         <div class="mb-3">
                             <label for="{{ form.linea.id_for_label }}">Linea:</label>
                             {{ form.linea }}
                         </div>
-
                         <div class="mb-3">
                             <label for="{{ form.sublinea.id_for_label }}">Sublinea:</label>
                             {{ form.sublinea }}
                         </div>
                         
+                        <button id="mostrarArticulosBtn" class="btn btn-primary">Artículos</button>
 
-                        <!-- Nuevo contenido para mostrar Condiciones -->
-                        <div class="mt-4">
-                            <h5 class="mb-3">Condiciones</h5>
+                        <!-- Sección para mostrar los artículos (inicialmente oculta) -->
+                        <div id="tablaArticulos" class="mt-4" style="display: none;">
+                            <h5 class="mb-3">Artículos</h5>
+                            <table class="table">
+                                <!-- ... (cabecera de la tabla) ... -->
+                                <tbody>
+                                    {% for articulo in articulos %}
+                                        <tr>
+                                            <!-- Caja de selección para cada artículo -->
+                                            <td>
+                                                <input type="checkbox" name="articulosSeleccionados" value="{{ articulo.id }}">
+                                            </td>
+                                            <!-- Campos de información del artículo -->
+                                            <td>{{ articulo.codigo_sku }}</td>
+                                            <td>{{ articulo.descripcion }}</td>
+                                            <!-- ... (otros campos relevantes) ... -->
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <button id="aceptarArticulosBtn" class="btn btn-primary mt-3">Aceptar</button>
+                        </div>
+
+                        <!-- Tabla para mostrar los artículos seleccionados -->
+                        <div id="articulosSeleccionados" class="mt-4" style="display: none;">
+                            <h5 class="mb-3">Artículos Seleccionados</h5>
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Código SKU</th>
-                                        
-                                        <th scope="col">Cantidad</th>
+                                        <th>Código SKU</th>
+                                        <th>Descripción</th>
+                                        <th>Cantidad</th>
+                                        <!-- ... (otros campos relevantes) ... -->
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Puedes iterar sobre las condiciones si hay múltiples -->
-                                    <tr>
-                                        <td>{{ form.codigo_sku }}</td>
-                                        <td>{{ form.cantidad }}</td>
-                                    </tr>
+                                    <!-- Aquí se mostrarán los artículos seleccionados -->
                                 </tbody>
                             </table>
+                            <button type="submit" class="btn btn-primary mt-3">Guardar</button>
                         </div>
-
-                        <!-- Fin del nuevo contenido -->
-
-                        <button type="submit" class="btn btn-primary">Guardar</button>
                     </form>
                 </div>
             </div>
@@ -84,30 +99,53 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Obtén referencias a los elementos del formulario
-            const codigoSkuSelect = document.getElementById('id_codigo_sku');
-            const descripcionCondicionInput = document.getElementById('id_descripcion_condicion');
-
-            // Agrega un evento de cambio al campo de selección de código SKU
-            codigoSkuSelect.addEventListener('change', function () {
-                // Obtén la descripción del producto seleccionado
-                const descripcionProducto = obtenerDescripcionProducto(codigoSkuSelect.value);
-
-                // Asigna la descripción al campo de entrada
-                descripcionCondicionInput.value = descripcionProducto;
-            });
-
-            // Función para obtener la descripción del producto
-            function obtenerDescripcionProducto(codigoSku) {
-                // Realiza una solicitud AJAX o utiliza otra lógica para obtener la descripción
-                // Puedes modificar esto según cómo esté estructurada tu aplicación
-                // Por ahora, solo devolvemos un valor de ejemplo
-                return "Descripción del producto para " + codigoSku;
-            }
+        document.getElementById('mostrarArticulosBtn').addEventListener('click', function () {
+            var tablaArticulos = document.getElementById('tablaArticulos');
+            tablaArticulos.style.display = (tablaArticulos.style.display === 'none' || tablaArticulos.style.display === '') ? 'block' : 'none';
         });
+
+        document.getElementById('aceptarArticulosBtn').addEventListener('click', function () {
+            var tablaArticulos = document.getElementById('tablaArticulos');
+            var articulosSeleccionados = document.getElementById('articulosSeleccionados');
+            
+            // Limpia la tabla de artículos seleccionados
+            var tbody = document.querySelector('#articulosSeleccionados tbody');
+            tbody.innerHTML = '';
+
+            // Obtiene los artículos seleccionados
+            var articulosCheckbox = document.getElementsByName('articulosSeleccionados');
+            for (var i = 0; i < articulosCheckbox.length; i++) {
+                if (articulosCheckbox[i].checked) {
+                    var articuloId = articulosCheckbox[i].value;
+                    var articulo = obtenerArticuloPorId(articuloId);
+                    
+                    // Agrega el artículo a la tabla de artículos seleccionados
+                    var row = tbody.insertRow();
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    cell1.innerHTML = articulo.codigo_sku;
+                    cell2.innerHTML = articulo.descripcion;
+                    cell3.innerHTML = '<input type="number" name="cantidades[]" value="1" min="1">';
+                    // ... (otros campos relevantes) ...
+                }
+            }
+
+            // Muestra la tabla de artículos seleccionados
+            articulosSeleccionados.style.display = 'block';
+        });
+
+        // Función para obtener la información de un artículo por ID
+        function obtenerArticuloPorId(articuloId) {
+            // Obtiene el elemento del formulario con el ID del artículo
+            var articuloElement = document.querySelector('[value="' + articuloId + '"]');
+            
+            // Obtiene la información del artículo directamente desde el formulario
+            return {
+                codigo_sku: articuloElement.parentElement.nextElementSibling.textContent,
+                descripcion: articuloElement.parentElement.nextElementSibling.nextElementSibling.textContent,
+                // ... (otros campos relevantes) ...
+            };
+        }
     </script>
 {% endblock %}
-
-
-
