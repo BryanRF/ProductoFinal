@@ -42,7 +42,7 @@
                             <td>{{ nota_venta.get_tipo_documento_display }}</td>
                             <td>{{ nota_venta.total_pedido }}</td>
                             <td>
-                                <a href="{% url 'editar_nota_venta' nota_venta.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
+                                <a href="{% url 'editar_nota_venta' nota_venta.id %}" class="btn btn-sm "><i class="bi bi-pencil-square"></i></a>
                                 <a href="{% url 'eliminar_nota_venta' nota_venta.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
