@@ -222,8 +222,6 @@ class PromocionForm(forms.ModelForm):
             'fecha_fin': forms.TextInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'activo': forms.Select(attrs={'class': 'form-select'},choices=((True, 'Activo'), (False, 'Bloqueado'))),
             'tipo_cliente': forms.Select(attrs={'class': 'form-select'}),
-            'linea': forms.Select(attrs={'class': 'form-select'}),
-            'sublinea': forms.Select(attrs={'class': 'form-select'}),
             'codigo_sku': forms.Select(attrs={'class': 'form-select', 'id': 'id_codigo_sku'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
         }

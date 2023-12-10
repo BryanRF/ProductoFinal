@@ -222,8 +222,6 @@ class Promocion(models.Model):
     fecha_fin = models.DateTimeField()
     activo = models.BooleanField()
     tipo_cliente = models.ForeignKey(CanalCliente, on_delete=models.CASCADE, related_name='promociones')
-    linea = models.ForeignKey(LineasArticulos, on_delete=models.CASCADE, related_name='promociones')
-    sublinea = models.ForeignKey(SublineasArticulos, on_delete=models.CASCADE, related_name='promociones')
     codigo_sku = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='promociones', null=True, blank=True)
     cantidad = models.PositiveIntegerField(default=0)
 
