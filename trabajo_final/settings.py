@@ -81,6 +81,16 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'producto_final',  # Crear antes de ejecutar el migrate
+#         'USER': 'root',
+#         'PASSWORD': '',
+#         'HOST': 'localhost',  # Puedes cambiarlo si tu base de datos está en otro servidor
+#         'PORT': '3306',  # El puerto predeterminado de MySQL es 3306
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
