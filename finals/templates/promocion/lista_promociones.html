@@ -24,6 +24,8 @@
                             <th scope="col">Fecha de Fin</th>
                             <th scope="col">Estado</th>
                             <th scope="col">Tipo Cliente</th>
+                            <th scope="col">Articulo</th>
+                            <th scope="col">Cantidad</th>
                            
     
                             
@@ -38,11 +40,8 @@
                             <td>{{ promocion.fecha_fin|date:'d/m/Y' }}</td>
                             <td>{{ promocion.activo }}</td>
                             <td>{{ promocion.tipo_cliente }}</td>
-                    
-
-                            
-                    
-                            
+                            <td>{{ promocion.articulo }}</td>
+                            <td>{{ promocion.cantidad }}</td>
                             <td>
                                 <a href="{% url 'editar_promocion' promocion.id %}" class="btn btn-sm "><i class="bi bi-pencil"></i></a>
                                 <a href="{% url 'eliminar_promocion' promocion.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>

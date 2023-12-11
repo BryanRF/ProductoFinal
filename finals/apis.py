@@ -1,10 +1,48 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status,generics
 from django.http import JsonResponse
 
-from .models import ItemsNotaVenta,Articulo,NotasVenta
-from .serializers import ItemsNotaVentaSerializer
+from .models import *
+from .serializers import *
+
+class PromocionListCreateView(generics.ListCreateAPIView):
+    queryset = Promocion.objects.all()
+    serializer_class = PromocionSerializer
+
+    def create(self, request, *args, **kwargs):
+        # Obtener la lista de promociones desde la solicitud
+        promociones_data = request.data.get('promociones', [])
+
+        # Lista para almacenar las instancias de Promocion creadas
+        promociones_creadas = []
+
+        # Iterar sobre los datos de promociones y crear instancias de Promocion
+        for promocion_data in promociones_data:
+            # Obtener el ID del artículo desde los datos de la promoción
+            articulo_id = promocion_data.get('articulo_id')
+
+            # Asegurarse de que el artículo exista antes de continuar
+            try:
+                articulo = Articulo.objects.get(id=articulo_id)
+            except Articulo.DoesNotExist:
+                return Response({'error': f'Articulo con ID {articulo_id} no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Agregar el artículo a los datos de la promoción antes de la creación
+            promocion_data['articulo'] = articulo.id
+
+            serializer = PromocionSerializer(data=promocion_data)
+            if serializer.is_valid():
+                serializer.save()
+                promociones_creadas.append(serializer.data)
+            else:
+                # Manejar el caso en que los datos no son válidos
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # Devolver la lista de promociones creadas en la respuesta
+        return Response({'promociones_creadas': promociones_creadas}, status=status.HTTP_201_CREATED)
+
+
 
 class ItemsNotaVentaAPIView(APIView):
     def __init__(self, *args, **kwargs):

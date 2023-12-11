@@ -222,7 +222,7 @@ class Promocion(models.Model):
     fecha_fin = models.DateTimeField()
     activo = models.BooleanField()
     tipo_cliente = models.ForeignKey(CanalCliente, on_delete=models.CASCADE, related_name='promociones')
-    codigo_sku = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='promociones', null=True, blank=True)
+    articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='promociones', null=True, blank=True)
     cantidad = models.PositiveIntegerField(default=0)
 
     def estado_activo(self):
