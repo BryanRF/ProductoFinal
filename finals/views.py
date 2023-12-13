@@ -565,17 +565,16 @@ def lista_promociones(request):
 
 # Vista para agregar una nueva promoción
 def agregar_promocion(request):
-    articulos = Articulo.objects.all()  # Obtén todos los artículos
+    articulos = Articulo.objects.all()
     if request.method == 'POST':
         form = PromocionForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_promociones')
     else:
         form = PromocionForm()
-
-    return render(request, 'promocion/agregar_editar_promocion.html', {'form': form, 'articulos': articulos})
-
+    return render(
+        request,
+        'promocion/agregar_editar_promocion.html',
+        {'form': form, 'articulos': articulos}
+    )
 # Vista para editar una promoción existente
 def editar_promocion(request, promocion_id):
     promocion = get_object_or_404(Promocion, id=promocion_id)

@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.utils import timezone
 import uuid
 
 class Empresa(models.Model):
@@ -78,7 +78,7 @@ class SublineasArticulos(models.Model):
         return self.codigo_sublinea
 
 class UnidadesMedida(models.Model):
-    id = models.CharField(primary_key=True, max_length=10)
+    id = models.IntegerField(primary_key=True)
     unidad_nombre = models.CharField(max_length=150)
     def __str__(self):
         return self.unidad_nombre
@@ -214,7 +214,7 @@ class Promocion(models.Model):
 
     ESTADO_CHOICES = [
         (True, 'Activo'),
-        (False, 'Bloqueado'),
+        (False, 'Inactivo'),
     ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     descripcion = models.CharField(max_length=100)
@@ -232,3 +232,52 @@ class Promocion(models.Model):
             return "Inactivo"
     def __str__(self):
         return self.descripcion
+
+class Promocion(models.Model):
+    TIPO_PROMOCION_CHOICES = [
+        ('caso_1', 'Descuento por Cantidad Comprada (1)'),
+        ('caso_2', 'Bonificación por Monto Total (2)'),
+        ('caso_3', 'Bonitifacion por productos y presentaciones(3)'),
+        ('Descuento_Rango', 'Descuento por Rango de Compra'),
+        ('Descuento_Monto', 'Descuento por Monto Total'),
+        ('Bonificacion', 'Bonificación'),
+        ('Bonificacion_Cantidad', 'Bonificación por Cantidad Comprada'),
+        ('Bonificacion_Proveedor', 'Bonificación por Proveedor'),
+        ('Bonificacion_Rango', 'Bonificación por Rango de Compra'),
+        ('Regalo', 'Regalo con Compra'),
+        ('Regalo_Cantidad', 'Regalo por Cantidad Comprada'),
+        ('Regalo_Monto', 'Regalo por Monto Total'),
+        ('Regalo_Proveedor', 'Regalo por Proveedor'),
+        ('Regalo_Rango', 'Regalo por Rango de Compra'),
+    ]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tipo_promocion = models.CharField(max_length=50, choices=TIPO_PROMOCION_CHOICES)
+    descripcion = models.CharField(max_length=100, blank=True, null=True)
+    fecha_inicio = models.DateTimeField(blank=True, null=True)
+    fecha_fin = models.DateTimeField(blank=True, null=True)
+    tipo_cliente = models.ForeignKey(CanalCliente, on_delete=models.CASCADE, related_name='promociones', blank=True, null=True)
+    condiciones = models.TextField(blank=True, null=True)
+    descuentos = models.TextField(blank=True, null=True)
+    formula = models.CharField(max_length=255, blank=True, null=True)
+    cantidad_minima_compra = models.PositiveIntegerField(default=0, blank=True, null=True)
+    unidades_bonificadas = models.PositiveIntegerField(default=0, blank=True, null=True)
+    monto_minimo = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, blank=True, null=True)
+    monto_maximo = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    porcentaje_descuento = models.IntegerField(default=0, blank=True, null=True)
+    proveedor = models.ForeignKey(GruposProveedor, on_delete=models.CASCADE, related_name='promociones', blank=True, null=True)
+    articulo_aplicable = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='productos_aplicables', blank=True, null=True)
+    articulo_bonificacion = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='productos_bonificacion', blank=True, null=True)
+    activo = models.BooleanField(default=False)
+
+    def esta_activa(self):
+        ahora = timezone.now()
+        return self.fecha_inicio <= ahora <= self.fecha_fin if self.fecha_inicio and self.fecha_fin else False
+    def estado_activo(self):
+        return "Activo" if self.activo else "Inactivo"
+
+    def __str__(self):
+        return self.descripcion
+
+class Promocion_articulos_asociados(models.Model):
+    promocion = models.ForeignKey(Promocion, on_delete=models.CASCADE)
+    articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE)

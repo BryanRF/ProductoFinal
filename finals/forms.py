@@ -1,5 +1,6 @@
 from django import forms
 from .models import *
+from django.forms.models import inlineformset_factory
 #----------------------Empresa-------------------
 class EmpresaForm(forms.ModelForm):
     class Meta:
@@ -210,18 +211,48 @@ class ItemsNotaVentaForm(forms.ModelForm):
         }
 
 #----------------------PROMOCIONES-------------
-class PromocionForm(forms.ModelForm):
-    descripcion_articulo = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
 
+from django import forms
+
+class PromocionForm(forms.ModelForm):
     class Meta:
         model = Promocion
-        fields = '__all__'
+        fields = [
+            'tipo_promocion',
+            'descripcion',
+            'fecha_inicio',
+            'fecha_fin',
+            'tipo_cliente',
+            'condiciones',
+            'descuentos',
+            'formula',
+            'articulo_aplicable',
+            'cantidad_minima_compra',
+            'unidades_bonificadas',
+            'monto_maximo',
+            'monto_minimo',
+            'porcentaje_descuento',
+            'proveedor',
+            'articulo_bonificacion',
+            'unidades_bonificadas',
+        ]
+
         widgets = {
+            'tipo_promocion': forms.Select(attrs={'class': 'form-control'}),
             'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
-            'fecha_inicio': forms.TextInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
-            'fecha_fin': forms.TextInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
-            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'tipo_cliente': forms.Select(attrs={'class': 'form-select'}),
-            'articulo': forms.Select(attrs={'class': 'form-select', 'id': 'id_articulo'}),
-            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
+            'fecha_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'fecha_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'tipo_cliente': forms.Select(attrs={'class': 'form-control'}),
+            'condiciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'descuentos': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'formula': forms.TextInput(attrs={'class': 'form-control'}),
+            'articulo_aplicable': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad_minima_compra': forms.NumberInput(attrs={'class': 'form-control'}),
+            'monto_minimo': forms.NumberInput(attrs={'class': 'form-control'}),
+            'monto_maximo': forms.NumberInput(attrs={'class': 'form-control'}),
+            'porcentaje_descuento': forms.NumberInput(attrs={'class': 'form-control'}),  
+            'proveedor': forms.Select(attrs={'class': 'form-control'}),
+            'articulo_bonificacion': forms.Select(attrs={'class': 'form-control'}),
+            'unidades_bonificadas': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
