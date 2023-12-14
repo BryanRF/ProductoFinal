@@ -40,8 +40,8 @@ urlpatterns = [
 #----------------------Unidades de Medida-------------------
     path('listar_unidades_medida/', listar_unidades_medida, name='listar_unidades_medida'),
     path('agregar_unidad_medida/', agregar_unidad_medida, name='agregar_unidad_medida'),
-    path('editar_unidad_medida/<int:id>/', editar_unidad_medida, name='editar_unidad_medida'),
-    path('eliminar_unidad_medida/<int:id>/', eliminar_unidad_medida, name='eliminar_unidad_medida'),
+    path('editar_unidad_medida/<uuid:unidad_medida_id>/', editar_unidad_medida, name='editar_unidad_medida'),
+    path('eliminar_unidad_medida/<uuid:unidad_medida_id>/', eliminar_unidad_medida, name='eliminar_unidad_medida'),
 #----------------------Usuarios-------------------
     path('lista_usuarios/', lista_usuarios, name='lista_usuarios'),
     path('agregar_usuario/', agregar_usuario, name='agregar_usuario'),

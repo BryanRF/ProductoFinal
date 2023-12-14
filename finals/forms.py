@@ -16,7 +16,7 @@ class EmpresaForm(forms.ModelForm):
 class ArticuloForm(forms.ModelForm):
     class Meta:
         model = Articulo
-        fields = ['codigo_sku', 'precio_unitario', 'descripcion', 'unidad_medida', 'grupo', 'linea', 'sublinea', 'empresa', 'factor_compra', 'factor_reparto', 'marca']
+        fields = ['codigo_sku', 'precio_unitario', 'descripcion', 'unidad_medida', 'grupo', 'linea', 'sublinea', 'empresa', 'marca']
         widgets = {
             'codigo_sku': forms.TextInput(attrs={'class': 'form-control'}),
             'precio_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -26,8 +26,6 @@ class ArticuloForm(forms.ModelForm):
             'linea': forms.Select(attrs={'class': 'form-control'}),
             'sublinea': forms.Select(attrs={'class': 'form-control'}),
             'empresa': forms.Select(attrs={'class': 'form-control'}),
-            'factor_compra': forms.NumberInput(attrs={'class': 'form-control'}),
-            'factor_reparto': forms.NumberInput(attrs={'class': 'form-control'}),
             'marca': forms.Select(attrs={'class': 'form-control'}),
         }
 #----------------------Grupo Proveedor-------------------
@@ -56,8 +54,7 @@ class MarcasForm(forms.ModelForm):
 class LineasArticulosForm(forms.ModelForm):
     class Meta:
         model = LineasArticulos
-        fields = '__all__'
-
+        fields = ['codigo_linea', 'linea_descripcion', 'grupo', 'activo', 'responsable_linea']
     widgets = {
         'codigo_linea': forms.TextInput(attrs={'class': 'form-control'}),
         'linea_descripcion': forms.TextInput(attrs={'class': 'form-control'}),
@@ -93,9 +90,8 @@ class SublineasArticulosForm(forms.ModelForm):
 class UnidadesMedidaForm(forms.ModelForm):
     class Meta:
         model = UnidadesMedida
-        fields = ['id', 'unidad_nombre']
+        fields = ['unidad_nombre']
         widgets = {
-            'id': forms.TextInput(attrs={'class': 'form-control'}),
             'unidad_nombre': forms.TextInput(attrs={'class': 'form-control'}),
         }
 #----------------------Usuarios-------------------
@@ -223,11 +219,9 @@ class PromocionForm(forms.ModelForm):
             'fecha_inicio',
             'fecha_fin',
             'tipo_cliente',
-            'condiciones',
-            'descuentos',
-            'formula',
             'articulo_aplicable',
             'cantidad_minima_compra',
+            'cantidad_maxima_compra',
             'unidades_bonificadas',
             'monto_maximo',
             'monto_minimo',
@@ -243,11 +237,9 @@ class PromocionForm(forms.ModelForm):
             'fecha_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fecha_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'tipo_cliente': forms.Select(attrs={'class': 'form-control'}),
-            'condiciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'descuentos': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'formula': forms.TextInput(attrs={'class': 'form-control'}),
             'articulo_aplicable': forms.Select(attrs={'class': 'form-control'}),
             'cantidad_minima_compra': forms.NumberInput(attrs={'class': 'form-control'}),
+            'cantidad_maxima_compra': forms.NumberInput(attrs={'class': 'form-control'}),
             'monto_minimo': forms.NumberInput(attrs={'class': 'form-control'}),
             'monto_maximo': forms.NumberInput(attrs={'class': 'form-control'}),
             'porcentaje_descuento': forms.NumberInput(attrs={'class': 'form-control'}),  

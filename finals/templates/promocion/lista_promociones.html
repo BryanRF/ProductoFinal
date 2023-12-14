@@ -33,7 +33,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for promocion in promociones %}
+                        {% comment %} {% for promocion in promociones %}
                         <tr>
                             <td>{{ promocion.descripcion }}</td>
                             <td>{{ promocion.fecha_inicio|date:'d/m/Y' }}</td>
@@ -47,7 +47,7 @@
                                 <a href="{% url 'eliminar_promocion' promocion.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
-                        {% endfor %}
+                        {% endfor %} {% endcomment %}
                     </tbody>
                 </table>
 

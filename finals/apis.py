@@ -6,41 +6,76 @@ from django.http import JsonResponse
 from .models import *
 from .serializers import *
 
-class PromocionListCreateView(generics.ListCreateAPIView):
-    queryset = Promocion.objects.all()
-    serializer_class = PromocionSerializer
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import Promocion, Promocion_articulos_asociados, Promocion_articulos_bonificados
+from django.views.decorators.csrf import csrf_exempt
+import json
+from datetime import datetime
 
-    def create(self, request, *args, **kwargs):
-        # Obtener la lista de promociones desde la solicitud
-        promociones_data = request.data.get('promociones', [])
+@csrf_exempt
+def promocion_list_create(request):
+    try:
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            tipo_promocion = data.get('tipo_promocion')
+            descripcion = data.get('descripcion')
+            fecha_inicio = data.get('fecha_inicio')
+            fecha_fin = data.get('fecha_fin')
+            tipo_cliente_id = data.get('tipo_cliente')
+            cantidad_minima_compra = data.get('cantidad_minima_compra')
+            cantidad_maxima_compra = data.get('cantidad_maxima_compra')
+            unidades_bonificadas = data.get('unidades_bonificadas')
+            monto_minimo = data.get('monto_minimo')
+            monto_maximo = data.get('monto_maximo')
+            porcentaje_descuento = data.get('porcentaje_descuento')
+            proveedor_id = data.get('proveedor')
+            articulo_aplicable_id = data.get('articulo_aplicable')
+            articulo_bonificacion_id = data.get('articulo_bonificacion')
+            promocion = Promocion.objects.create(
+                tipo_promocion=tipo_promocion,
+                descripcion=descripcion,
+                fecha_inicio=fecha_inicio,
+                fecha_fin=fecha_fin,
+                tipo_cliente_id=tipo_cliente_id,
+                cantidad_minima_compra=cantidad_minima_compra,
+                cantidad_maxima_compra=cantidad_maxima_compra,
+                unidades_bonificadas=unidades_bonificadas,
+                monto_minimo=monto_minimo,
+                monto_maximo=monto_maximo,
+                porcentaje_descuento=porcentaje_descuento,
+                proveedor_id=proveedor_id,
+                articulo_aplicable_id=articulo_aplicable_id,
+                articulo_bonificacion_id=articulo_bonificacion_id,
+            )
 
-        # Lista para almacenar las instancias de Promocion creadas
-        promociones_creadas = []
+            articulos_asociados = data.get('articulosSeleccionadosModal', [])
+            for articulo in articulos_asociados:
+                cantidad = articulo.get('cantidad')
+                articulo_id = articulo.get('id')
+                Promocion_articulos_asociados.objects.create(
+                    promocion=promocion,
+                    cantidad_articulo=cantidad,
+                    articulo_id=articulo_id
+                )
 
-        # Iterar sobre los datos de promociones y crear instancias de Promocion
-        for promocion_data in promociones_data:
-            # Obtener el ID del artículo desde los datos de la promoción
-            articulo_id = promocion_data.get('articulo_id')
+            # Procesar los datos de los artículos bonificados
+            articulos_bonificados = data.get('articulosSeleccionadosBonificadosModal', [])
+            for articulo in articulos_bonificados:
+                cantidad = articulo.get('cantidad')
+                articulo_id = articulo.get('id')
+                Promocion_articulos_bonificados.objects.create(
+                    promocion=promocion,
+                    cantidad_articulo=cantidad,
+                    articulo_id=articulo_id
+                )
 
-            # Asegurarse de que el artículo exista antes de continuar
-            try:
-                articulo = Articulo.objects.get(id=articulo_id)
-            except Articulo.DoesNotExist:
-                return Response({'error': f'Articulo con ID {articulo_id} no encontrado'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'message': 'Promoción creada exitosamente', 'ok':True}, status=201)
+    except Exception as e:
+            return JsonResponse({'message': f'Error al procesar la solicitud: {str(e)}', 'ok':False}, status=500)
 
-            # Agregar el artículo a los datos de la promoción antes de la creación
-            promocion_data['articulo'] = articulo.id
+    return JsonResponse({'message': 'Método no permitido', 'ok':False}, status=405)
 
-            serializer = PromocionSerializer(data=promocion_data)
-            if serializer.is_valid():
-                serializer.save()
-                promociones_creadas.append(serializer.data)
-            else:
-                # Manejar el caso en que los datos no son válidos
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        # Devolver la lista de promociones creadas en la respuesta
-        return Response({'promociones_creadas': promociones_creadas}, status=status.HTTP_201_CREATED)
 
 
 

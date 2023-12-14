@@ -26,7 +26,6 @@
 
 {% block content %}
 <div class="container-fluid">
-  <!-- Page Heading -->
   <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Promociones</h1>
     <a
@@ -35,253 +34,490 @@
       >Mostrar Lista</a
     >
   </div>
-
-  <!-- Content Row -->
   <div class="card shadow mb-4">
     <div class="card-header py-3">
       <h6 class="m-0 font-weight-bold text-primary">Agregar Promoción</h6>
     </div>
     <div class="card-body">
-        <form id="formPromocion">
-                {% csrf_token %}
-                <div class="row mb-3">
+      <form id="formPromocion">
+        {% csrf_token %}
+        <div class="row mb-3">
+          <div class="col-12">
+            <label for="{{ form.tipo_promocion.id_for_label }}"
+              >Tipo promocion</label
+            >
+            {{ form.tipo_promocion }}
+          </div>
+          <div class="col-12" id="div_descripcion">
+            <label for="{{ form.descripcion.id_for_label }}">Descripcion</label>
+            {{ form.descripcion }}
+          </div>
 
-                    <div class="col-12" >
-                        <label for="{{ form.tipo_promocion.id_for_label }}">Tipo promocion</label>
-                        {{ form.tipo_promocion }}
-                    </div>
-            
-                    <div class="col-6" id="div_descripcion">
-                        <label for="{{ form.descripcion.id_for_label }}">Descripcion</label>
-                        {{ form.descripcion }}
-                    </div>
-            
-                    <div class="col-3" id="div_fecha_inicio">
-                        <label for="{{ form.fecha_inicio.id_for_label }}">Fecha inicio</label>
-                        {{ form.fecha_inicio }}
-                    </div>
-            
-                    <div class="col-3" id="div_fecha_fin">
-                        <label for="{{ form.fecha_fin.id_for_label }}">Fecha fin</label>
-                        {{ form.fecha_fin }}
-                    </div>
-                    <div class="col-6" id="div_articulo_aplicable">
-                        <label for="{{ form.articulo_aplicable.id_for_label }}">Articulo aplicable</label>
-                        {{ form.articulo_aplicable }}
-                    </div>
-                    <div class="col-6" id="div_cantidad_minima_compra">
-                        <label for="{{ form.cantidad_minima_compra.id_for_label }}">Cantidad minima compra</label>
-                        {{ form.cantidad_minima_compra }}
-                    </div>
-                    <div class="col-6" id="div_articulo_bonificacion">
-                        <label for="{{ form.articulo_bonificacion.id_for_label }}">Articulo bonificacion</label>
-                        {{ form.articulo_bonificacion }}
-                    </div>
-                    <div class="col-6" id="div_unidades_bonificadas">
-                        <label for="{{ form.unidades_bonificadas.id_for_label }}">Unidades bonificadas</label>
-                        {{ form.unidades_bonificadas }}
-                    </div>
-                    <div class="col-6" id="div_tipo_cliente">
-                        <label for="{{ form.tipo_cliente.id_for_label }}">Tipo cliente</label>
-                        {{ form.tipo_cliente }}
-                    </div>
-            
-                    <div class="col-6" id="div_condiciones">
-                        <label for="{{ form.condiciones.id_for_label }}">Condiciones</label>
-                        {{ form.condiciones }}
-                    </div>
-            
-                    <div class="col-6" id="div_descuentos">
-                        <label for="{{ form.descuentos.id_for_label }}">Descuentos</label>
-                        {{ form.descuentos }}
-                    </div>
-            
-                    <div class="col-6" id="div_formula">
-                        <label for="{{ form.formula.id_for_label }}">Formula</label>
-                        {{ form.formula }}
-                    </div>
-            
-                    <div class="col-6" id="div_monto_maximo">
-                        <label for="{{ form.monto_maximo.id_for_label }}">Monto maximo</label>
-                        {{ form.monto_maximo }}
-                    </div>
-            
-                    <div class="col-6" id="div_monto_minimo">
-                        <label for="{{ form.monto_minimo.id_for_label }}">Monto minimo</label>
-                        {{ form.monto_minimo }}
-                    </div>
-            
-                    <div class="col-6" id="div_porcentaje_descuento">
-                        <label for="{{ form.porcentaje_descuento.id_for_label }}">Porcentaje descuento</label>
-                        {{ form.porcentaje_descuento }}
-                    </div>
-            
-                    <div class="col-6" id="div_proveedor">
-                        <label for="{{ form.proveedor.id_for_label }}">Proveedor</label>
-                        {{ form.proveedor }}
-                    </div>
-            
-               
-            
+          <div class="col-3" id="div_fecha_inicio">
+            <label for="{{ form.fecha_inicio.id_for_label }}"
+              >Fecha inicio</label
+            >
+            {{ form.fecha_inicio }}
+          </div>
+          <div class="col-3" id="div_fecha_fin">
+            <label for="{{ form.fecha_fin.id_for_label }}">Fecha fin</label>
+            {{ form.fecha_fin }}
+          </div>
+          <div class="col-6" id="div_articulo_aplicable">
+            <label for="{{ form.articulo_aplicable.id_for_label }}"
+              >Articulo aplicable</label
+            >
+            {{ form.articulo_aplicable }}
+          </div>
+          <div class="col-3" id="div_cantidad_minima_compra">
+            <label for="{{ form.cantidad_minima_compra.id_for_label }}"
+              >Cantidad minima compra</label
+            >
+            {{ form.cantidad_minima_compra }}
+          </div>
+          <div class="col-3" id="div_cantidad_maxima_compra">
+            <label for="{{ form.cantidad_maxima_compra.id_for_label }}"
+              >Cantidad maxima compra</label
+            >
+            {{ form.cantidad_maxima_compra }}
+          </div>
+          <div class="col-6" id="div_articulo_bonificacion">
+            <label for="{{ form.articulo_bonificacion.id_for_label }}"
+              >Articulo bonificacion</label
+            >
+            {{ form.articulo_bonificacion }}
+          </div>
+          <div class="col-6" id="div_unidades_bonificadas">
+            <label for="{{ form.unidades_bonificadas.id_for_label }}"
+              >Unidades bonificadas</label
+            >
+            {{ form.unidades_bonificadas }}
+          </div>
+          <div class="col-6" id="div_tipo_cliente">
+            <label for="{{ form.tipo_cliente.id_for_label }}"
+              >Tipo cliente</label
+            >
+            {{ form.tipo_cliente }}
+          </div>
+          <div class="col-6" id="div_monto_maximo">
+            <label for="{{ form.monto_maximo.id_for_label }}"
+              >Monto maximo</label
+            >
+            {{ form.monto_maximo }}
+          </div>
+          <div class="col-6" id="div_monto_minimo">
+            <label for="{{ form.monto_minimo.id_for_label }}"
+              >Monto minimo</label
+            >
+            {{ form.monto_minimo }}
+          </div>
+          <div class="col-6" id="div_porcentaje_descuento">
+            <label for="{{ form.porcentaje_descuento.id_for_label }}"
+              >Porcentaje descuento</label
+            >
+            {{ form.porcentaje_descuento }}
+          </div>
+          <div class="col-6" id="div_proveedor">
+            <label for="{{ form.proveedor.id_for_label }}">Proveedor</label>
+            {{ form.proveedor }}
+          </div>
+        </div>
+        <div id="div_productos_asociados">
+          <button
+            type="button"
+            id="mostrarArticulosBtn"
+            class="btn btn-success mb-4"
+            data-toggle="modal"
+            data-target="#myModal"
+          >
+            Seleccionar Artículos Asociados
+          </button>
+          <div
+            class="modal fade"
+            id="myModal"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Artículos</h5>
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
                 </div>
-                <div class="col-6" id="div_productos_asociados">
-                <button type="button" 
-                    id="mostrarArticulosBtn" class="btn btn-success" data-toggle="modal" data-target="#myModal">Seleccionar Artículos Asociados</button>
-      
-               
-              
-                <!-- Ventana Modal -->
-                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Artículos</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <table class="table">
-                                    <!-- ... (cabecera de la tabla) ... -->
-                                    <tbody>
-                                        {% for articulo in articulos %}
-                                            <tr>
-                                                <!-- Caja de selección para cada artículo -->
-                                                <td>
-                                                    <input type="checkbox" name="articulosSeleccionadosModal" value="{{ articulo.id }}">
-                                                </td>
-                                                <!-- Campos de información del artículo -->
-                                                <td>{{ articulo.codigo_sku }}</td>
-                                                <td>{{ articulo.descripcion }}</td>
-                                                <!-- ... (otros campos relevantes) ... -->
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" onclick="aceptarArticulosModal()">Aceptar</button>
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="modal-body">
+                  <table class="table">
+                    <tbody>
+                      {% for articulo in articulos %}
+                      <tr>
+                        <td>
+                          <input
+                            type="checkbox"
+                            name="articulosSeleccionadosModal"
+                            value="{{ articulo.id }}"
+                          />
+                        </td>
+                        <td>{{ articulo.codigo_sku }}</td>
+                        <td>{{ articulo.descripcion }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
                 </div>
-
-                <!-- ... (otros campos del formulario) ... -->
-
-                <div id="articulosSeleccionados" class="mt-4" style="display: none;">
-                    <h5 class="mb-3">Artículos Seleccionados</h5>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Código SKU</th>
-                                <th>Descripción</th>
-                                <th>Cantidad</th>
-                                <!-- ... (otros campos relevantes) ... -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Aquí se mostrarán los artículos seleccionados -->
-                        </tbody>
-                    </table>
-                
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="aceptarArticulosModal()"
+                  >
+                    Aceptar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-dismiss="modal"
+                  >
+                    Cancelar
+                  </button>
                 </div>
+              </div>
             </div>
-                <!-- Otros elementos del formulario (si los hay) -->
-                <button type="submit" class="btn btn-primary">Guardar</button>
-              </form>
+          </div>
+          <div id="articulosSeleccionados" class="mt-4" style="display: none">
+            <h5 class="mb-3">Artículos Asociados Seleccionados</h5>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Código SKU</th>
+                  <th>Descripción</th>
+                  <th>Cantidad</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="div_productos_bonificados">
+          <button
+            type="button"
+            id="mostrarArticulosBonificadosBtn"
+            class="btn btn-success mb-4"
+            data-toggle="modal"
+            data-target="#myModalBonificados"
+          >
+            Seleccionar Artículos Bonificados
+          </button>
+          <div
+            class="modal fade"
+            id="myModalBonificados"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">
+                    Artículos Bonificados
+                  </h5>
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <table class="table">
+                    <tbody>
+                      {% for articulo in articulos %}
+                      <tr>
+                        <td>
+                          <input
+                            type="checkbox"
+                            name="articulosSeleccionadosBonificadosModal"
+                            value="{{ articulo.id }}"
+                          />
+                        </td>
+                        <td>{{ articulo.codigo_sku }}</td>
+                        <td>{{ articulo.descripcion }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="aceptarArticulosBonificadosModal()"
+                  >
+                    Aceptar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-dismiss="modal"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            id="articulosBonificadosSeleccionados"
+            class="mt-4"
+            style="display: none"
+          >
+            <h5 class="mb-3">Artículos Bonificados Seleccionados</h5>
+            <table class="table" id="bonificados">
+              <thead>
+                <tr>
+                  <th>Código SKU</th>
+                  <th>Descripción</th>
+                  <th>Cantidad</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <button type="button" id="enviarRegistro" class="btn btn-primary">Guardar</button>
+      </form>
     </div>
   </div>
 </div>
-<!-- Asegúrate de cargar jQuery antes de tu script -->
 <script>
-    $(document).ready(function () {
-        // Función para mostrar u ocultar campos según el tipo de promoción
-        function mostrarCamposSegunTipoPromocion() {
-            var tipoPromocion = $('#id_tipo_promocion').val();
+  document
+    .getElementById("mostrarArticulosBtn")
+    .addEventListener("click", function () {
+      $("#myModal").modal("show");
+    });
 
-            // Ocultar todos los campos relacionados con la promoción
-            $('[id^="div_"]').css('display', 'none');
+  function aceptarArticulosModal() {
+    var articulosSeleccionados = document.getElementsByName(
+      "articulosSeleccionadosModal"
+    );
+    var tbody = document.querySelector("#articulosSeleccionados tbody");
+    tbody.innerHTML = "";
+    for (var i = 0; i < articulosSeleccionados.length; i++) {
+      if (articulosSeleccionados[i].checked) {
+        var fila = articulosSeleccionados[i].closest("tr");
+        var codigoSku = fila.querySelector("td:nth-child(2)").textContent;
+        var descripcion = fila.querySelector("td:nth-child(3)").textContent;
+        var row = tbody.insertRow();
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        cell1.innerHTML = codigoSku;
+        cell2.innerHTML = descripcion;
+        cell3.innerHTML =
+          '<input type="number" name="cantidades[' +
+          i +
+          ']" value="1" min="1">';
+      }
+    }
+    $("#myModal").modal("hide");
+    document.getElementById("articulosSeleccionados").style.display = "block";
+  }
+  function obtenerArticuloPorId(articuloId) {
+    var checkbox = document.querySelector(
+      'input[name="articulosSeleccionadosModal"][value="' + articuloId + '"]'
+    );
+    if (checkbox) {
+      var fila = checkbox.closest("tr");
+      var codigo_sku = fila.querySelector("td:nth-child(2)").textContent;
+      var descripcion = fila.querySelector("td:nth-child(3)").textContent;
+      return {
+        codigo_sku: codigo_sku,
+        descripcion: descripcion,
+      };
+    } else {
+      console.error(
+        "Checkbox no encontrado para el ID del artículo: " + articuloId
+      );
+      return null;
+    }
+  }
+</script>
+<script>
+  document
+    .getElementById("mostrarArticulosBonificadosBtn")
+    .addEventListener("click", function () {
+      $("#myModalBonificados").modal("show");
+    });
 
-            // Mostrar campos específicos según el tipo de promoción
-           
-            switch (tipoPromocion) {
-                case 'caso_1':
-                    $('#div_descripcion, #div_articulo_aplicable, #div_articulo_bonificacion, #div_cantidad_minima_compra, #div_unidades_bonificadas, #div_fecha_inicio,#div_fecha_fin,#div_tipo_cliente').show();
-                    break;
-                // Agrega más casos según sea necesario
-                case 'caso_2':
-                    // Mostrar los campos generales en caso de otros tipos de promoción
-                    $('#div_fecha_inicio,#div_fecha_fin ,#div_monto_minimo, #div_porcentaje_descuento,#div_tipo_cliente').show();
-                    break;
-                case 'caso_3':
-                    // Mostrar los campos generales en caso de otros tipos de promoción
-                    $('#div_fecha_inicio,#div_fecha_fin ,#div_tipo_cliente, #div_porcentaje_descuento,#div_productos_asociados').show();
-                    break;
-            }
-            // Agrega lógica para otros tipos de promoción si es necesario
-        }
+  function aceptarArticulosBonificadosModal() {
+    var articulosSeleccionados = document.getElementsByName(
+      "articulosSeleccionadosBonificadosModal"
+    );
+    var tbody = document.querySelector(
+      "#articulosBonificadosSeleccionados tbody"
+    );
+    tbody.innerHTML = "";
+    for (var i = 0; i < articulosSeleccionados.length; i++) {
+      if (articulosSeleccionados[i].checked) {
+        var fila = articulosSeleccionados[i].closest("tr");
+        var codigoSku = fila.querySelector("td:nth-child(2)").textContent;
+        var descripcion = fila.querySelector("td:nth-child(3)").textContent;
+        var row = tbody.insertRow();
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        cell1.innerHTML = codigoSku;
+        cell2.innerHTML = descripcion;
+        cell3.innerHTML =
+          '<input type="number" name="cantidades[' +
+          i +
+          ']" value="1" min="1">';
+      }
+    }
+    $("#myModalBonificados").modal("hide");
+    document.getElementById("articulosBonificadosSeleccionados").style.display =
+      "block";
+  }
+  function obtenerArticuloPorId(articuloId) {
+    var checkbox = document.querySelector(
+      'input[name="articulosSeleccionadosBonificadosModal"][value="' +
+        articuloId +
+        '"]'
+    );
+    if (checkbox) {
+      var fila = checkbox.closest("tr");
+      var codigo_sku = fila.querySelector("td:nth-child(2)").textContent;
+      var descripcion = fila.querySelector("td:nth-child(3)").textContent;
+      return {
+        codigo_sku: codigo_sku,
+        descripcion: descripcion,
+      };
+    } else {
+      console.error(
+        "Checkbox no encontrado para el ID del artículo: " + articuloId
+      );
+      return null;
+    }
+  }
+</script>
+<script>
+  $(document).ready(function () {
+    // Función para mostrar u ocultar campos según el tipo de promoción
+    function mostrarCamposSegunTipoPromocion() {
+      var tipoPromocion = $("#id_tipo_promocion").val();
 
-        // Ejecutar la función al cargar la página
-        mostrarCamposSegunTipoPromocion();
+      // Ocultar todos los campos relacionados con la promoción
+      $('[id^="div_"]').css("display", "none");
 
-        // Llamar a la función en respuesta al cambio en el tipo de promoción
-        $('#id_tipo_promocion').change(function () {
-            mostrarCamposSegunTipoPromocion();
+      // Mostrar campos específicos según el tipo de promoción
+
+      switch (tipoPromocion) {
+        case "caso_1":
+          $(
+            "#div_descripcion, #div_articulo_aplicable, #div_articulo_bonificacion, #div_cantidad_minima_compra, #div_unidades_bonificadas, #div_fecha_inicio,#div_fecha_fin,#div_tipo_cliente"
+          ).show();
+          break;
+        case "caso_2":
+          $(
+            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin ,#div_monto_minimo, #div_porcentaje_descuento,#div_tipo_cliente"
+          ).show();
+          break;
+        case "caso_3":
+          $(
+            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin ,#div_tipo_cliente, #div_porcentaje_descuento,#div_productos_asociados"
+          ).show();
+          break;
+        case "caso_4":
+          $(
+            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin , #div_porcentaje_descuento,#div_productos_asociados ,#div_cantidad_minima_compra,#div_cantidad_maxima_compra"
+          ).show();
+          break;
+        case "caso_5":
+          $(
+            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin , #div_porcentaje_descuento,#div_productos_asociados ,#div_monto_maximo,#div_monto_minimo"
+          ).show();
+          break;
+        case "caso_7":
+          $(
+            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin , #div_articulo_aplicable,#div_cantidad_minima_compra ,#div_unidades_bonificadas,#div_articulo_bonificacion"
+          ).show();
+          break;
+        case "caso_8":
+          $(
+            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin , #div_articulo_aplicable,#div_cantidad_minima_compra ,#div_productos_bonificados ,#div_porcentaje_descuento"
+          ).show();
+          break;
+        case "caso_9":
+          $(
+            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin , #div_articulo_aplicable,#div_monto_minimo ,#div_monto_maximo,#div_articulo_bonificacion,#div_unidades_bonificadas ,#div_porcentaje_descuento,#div_tipo_cliente"
+          ).show();
+          break;
+      }
+      // Agrega lógica para otros tipos de promoción si es necesario
+    }
+
+    // Ejecutar la función al cargar la página
+    mostrarCamposSegunTipoPromocion();
+
+    // Llamar a la función en respuesta al cambio en el tipo de promoción
+    $("#id_tipo_promocion").change(function () {
+      mostrarCamposSegunTipoPromocion();
+    });
+  });
+</script>
+<script>
+    document.getElementById("enviarRegistro").addEventListener("click", function() {
+        var formData = new FormData(document.getElementById("formPromocion"));
+        var jsonData = {};
+        formData.forEach(function(value, key) {
+            jsonData[key] = value;
+        });
+        jsonData["articulosSeleccionadosModal"] = obtenerArticulosSeleccionados("articulosSeleccionadosModal");
+        jsonData["articulosSeleccionadosBonificadosModal"] = obtenerArticulosSeleccionados("articulosSeleccionadosBonificadosModal");
+        fetch("{%url 'promocion-list-create'%}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken'), 
+            },
+            body: JSON.stringify(jsonData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Respuesta del servidor:', data);
+        })
+        .catch(error => {
+            console.error('Error en la solicitud fetch:', error);
         });
     });
-</script>
-
-<script>
-    document.getElementById('mostrarArticulosBtn').addEventListener('click', function () {
-        // Mostrar la ventana emergente al hacer clic en "Artículos"
-        $('#myModal').modal('show');
-    });
-
-    function aceptarArticulosModal() {
-        // Lógica para procesar los artículos seleccionados y cerrar la ventana
-        var articulosSeleccionados = document.getElementsByName('articulosSeleccionadosModal');
-
-        // Limpia la tabla de artículos seleccionados en la ventana principal
-        var tbody = document.querySelector('#articulosSeleccionados tbody');
-        tbody.innerHTML = '';
-
-        // Itera sobre los artículos seleccionados en la ventana emergente
-        for (var i = 0; i < articulosSeleccionados.length; i++) {
-            if (articulosSeleccionados[i].checked) {
-                var articuloId = articulosSeleccionados[i].value;
-                var articulo = obtenerArticuloPorId(articuloId);
-
-                // Agrega el artículo a la tabla de artículos seleccionados en la ventana principal
-                var row = tbody.insertRow();
-                var cell1 = row.insertCell(0);
-                var cell2 = row.insertCell(1);
-                var cell3 = row.insertCell(2);
-                cell1.innerHTML = articulo.codigo_sku;
-                cell2.innerHTML = articulo.descripcion;
-                cell3.innerHTML = '<input type="number" name="cantidades['+i+']" value="1" min="1">';
+    
+    function obtenerArticulosSeleccionados(checkboxName) {
+        var checkboxes = document.getElementsByName(checkboxName);
+        var articulosSeleccionados = [];
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                var articuloId = checkboxes[i].value;
+                var cantidadInputName = 'cantidades[' + i + ']';
+            var cantidadInput = document.querySelector('[name="' + cantidadInputName + '"]');
+            var cantidad = cantidadInput ? cantidadInput.value : 1;
+                var articulo = {
+                    id: articuloId,
+                    cantidad: cantidad,
+                };
+                articulosSeleccionados.push(articulo);
             }
         }
-
-        // Cierra la ventana emergente
-        $('#myModal').modal('hide');
-
-        // Muestra la tabla de artículos seleccionados
-        document.getElementById('articulosSeleccionados').style.display = 'block';
-    }
-
-    // Función para obtener la información de un artículo por ID
-    function obtenerArticuloPorId(articuloId) {
-        // Obtiene el elemento del formulario con el ID del artículo
-        var articuloElement = document.querySelector('[value="' + articuloId + '"]');
-
-        // Obtiene la información del artículo directamente desde el formulario
-        return {
-            codigo_sku: articuloElement.parentElement.nextElementSibling.textContent,
-            descripcion: articuloElement.parentElement.nextElementSibling.nextElementSibling.textContent,
-        };
+        return articulosSeleccionados;
     }
 </script>
-
-
 {% endblock %}

@@ -6,7 +6,7 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Articulos</h1>
-        <a href="{% url "crear_articulo" %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> Nuevo articulo</a>
+        <a href="{% url 'crear_articulo' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> Nuevo articulo</a>
     </div>
     <!-- Content Row -->
     <div class="card shadow mb-4">
@@ -15,7 +15,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                     <tr>
                         <th scope="col">Código SKU</th>
@@ -26,8 +26,6 @@
                         <th scope="col">Línea</th>
                         <th scope="col">Sublínea</th>
                         <th scope="col">Empresa</th>
-                        <th scope="col">Factor de Compra</th>
-                        <th scope="col">Factor de Reparto</th>
                         <th scope="col">Marca</th>
                         <th scope="col">Acciones</th>
                     </tr>
@@ -43,8 +41,6 @@
                         <td>{{ articulo.linea }}</td>
                         <td>{{ articulo.sublinea }}</td>
                         <td>{{ articulo.empresa }}</td>
-                        <td>{{ articulo.factor_compra }}</td>
-                        <td>{{ articulo.factor_reparto }}</td>
                         <td>{{ articulo.marca }}</td>
                         <td>
                             <a href="{% url 'editar_articulo' articulo.id %}" class="btn btn-sm "><i class="bi bi-pencil-square"></i></a>
