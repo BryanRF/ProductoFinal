@@ -92,6 +92,11 @@ class ItemsNotaVentaAPIView(APIView):
             self.caso1(id_articulo, cantidad_comprada)
             self.caso2(id_articulo, cantidad_comprada)
             self.caso3(id_articulo, cantidad_comprada)
+            self.caso4(id_articulo, cantidad_comprada)
+            self.caso5(id_articulo, cantidad_comprada)
+            self.caso7(id_articulo, cantidad_comprada)
+            self.caso8(id_articulo, cantidad_comprada)
+            self.caso9(id_articulo, cantidad_comprada)
             self.serializer.validated_data['descripcion'] = ", ".join(self.messages)
             data = {'message':  self.get_messages(), 'status':self.serializer.validated_data['es_bonificacion']}
             self.serializer.save()
