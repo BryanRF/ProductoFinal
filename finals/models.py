@@ -155,24 +155,25 @@ class Vendedor(models.Model):
         return self.nombres
 #-----------NOtas Vendedor--------------
 class NotasVenta(models.Model):
-    TIPO_DOCUMENTO_CHOICES = [
-        ('DNI', 'DNI'),
-        ('Pasaporte', 'Pasaporte'),
-    ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
     sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE)
-    nro_pedido = models.CharField(max_length=25)
-    fecha_pedido = models.DateTimeField()
-    tipo_pedido= models.ForeignKey(TipoPedido, on_delete=models.CASCADE)
+    fecha_pedido = models.DateTimeField(default=timezone.now)
+    tipo_pedido = models.ForeignKey(TipoPedido, on_delete=models.CASCADE)
     cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE)
     condicion_venta = models.ForeignKey(CondicionVentas, on_delete=models.CASCADE)
-    plazo= models.IntegerField()
-    tipo_documento = models.CharField(max_length=10, choices=TIPO_DOCUMENTO_CHOICES)
-    total_pedido = models.DecimalField(max_digits=12, decimal_places=2)
+    plazo = models.IntegerField()
+    total_pedido = models.DecimalField(max_digits=12, decimal_places=2, default=0, null=True) 
+    nro_pedido = models.IntegerField()
+
+    def save(self, *args, **kwargs):
+        if not self.nro_pedido:
+            ultimo_numero_pedido = NotasVenta.objects.filter(cliente=self.cliente).order_by('-fecha_pedido', '-id').values_list('nro_pedido', flat=True).first()
+            self.nro_pedido = ultimo_numero_pedido + 1 if ultimo_numero_pedido else 1
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.nro_pedido
-    
+        return str(self.nro_pedido)
     #-----------ITEM NOtas Vendedor--------------
 
 class ItemsNotaVenta(models.Model):
@@ -188,15 +189,11 @@ class ItemsNotaVenta(models.Model):
     total_item = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
     es_bonificacion = models.CharField(max_length=1 , default=0)
     def calcular_total_item(self):
-        # Calcula el total_item automáticamente
-        # total_item_bruto = 20  = 10*2
         self.total_item_bruto = (self.articulo.precio_unitario) * self.cantidad
         descuento = (self.articulo.precio_unitario * self.descuento_unitario) / 100
         self.total_item = (self.articulo.precio_unitario - descuento) * self.cantidad
     def save(self, *args, **kwargs):
-        # Llama al método de cálculo al guardar el objeto
         self.calcular_total_item()
-        # Si es un nuevo ítem y tiene una nota_venta asociada, incrementa el contador
         if not self.nro_item and self.nota_venta:
             ultimo_item = ItemsNotaVenta.objects.filter(nota_venta=self.nota_venta).order_by('-nro_item').first()
             if ultimo_item:

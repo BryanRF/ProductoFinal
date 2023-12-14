@@ -1,35 +1,118 @@
-{% extends 'master.html' %} 
-{% load static %} 
-{% block content %}
+{% extends 'master.html' %} {% load static %} {% block content %}
 <div class="container-fluid">
   <!-- Page Heading -->
   <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">ITEMS Notas de Venta</h1>
+    <h1 class="h3 mb-0 text-gray-800">Detalle de Venta</h1>
     <a
       href="{% url 'lista_items_nota_venta' %}"
       class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
       >Mostrar Lista</a
     >
+    
   </div>
-
-  <!-- Content Row -->
   <div class="card shadow mb-4">
     <div class="card-header py-3">
       <h6 class="m-0 font-weight-bold text-primary">
-        Agregar ITEM Nota de Venta
+        <p>Cliente: {{ nota_venta_data.cliente }}</p>
       </h6>
     </div>
     <div class="card-body">
-      <div class="table-responsive">
-        <form id="notaVentaForm">
-          {% csrf_token %} {{ form.as_p }}
-          <button type="button" class="btn btn-primary guardar">Guardar</button>
-        </form>
-      </div>
+      <form id="notaVentaForm">
+        {% csrf_token %}
+        <input
+          type="hidden"
+          name="nota_venta"
+          value="{{ nota_venta_data.id }}"
+        />
+        <div class="row">
+          <div class="col-6">
+            <label for="{{ form.articulo.id_for_label }}">Articulo</label>
+            {{ form.articulo }}
+          </div>
+          <div class="col-6">
+            <label for="{{ form.cantidad.id_for_label }}">Cantidad</label>
+            {{ form.cantidad }}
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary guardar mt-4">
+          Agregar
+        </button>
+      </form>
+    </div>
+  </div>
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Lista de items</h6>
+      <hr>
+     
+<div id="totalMaxContainer row">
+  <label for="total_max">Monto a pagar total</label>
+  <input
+
+    type="number"
+    readonly
+    min="0"
+    value="0"
+    class="form-control col-6"
+    id="total_max"
+  />
+</div>
+
+    </div>
+    <div class="card-body">
+      <table
+        class="table table-bordered"
+        id="dataTable1"
+        width="100%"
+        cellspacing="0"
+      >
+        <thead>
+          <tr>
+            <th scope="col">Nro. Item</th>
+            <th scope="col">Artículo</th>
+            <th scope="col">Precio Unitario</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Total Item Bruto</th>
+            <th scope="col">Factor Descuento</th>
+            <th scope="col">Descuento Unitario</th>
+            <th scope="col">Total Item</th>
+            <th scope="col">Descripcion Bonificación</th>
+            <th scope="col">Es Bonificacion</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
 </div>
 <script>
+  var dataTableInstance; 
+  $(document).ready(function () {
+    initializeTable();
+    actualizarTabla();
+  });
+  function actualizarTabla() {
+    if (dataTableInstance) {
+        dataTableInstance.one('draw.dt', function () {
+            var sumaTotalItem = dataTableInstance
+                .rows()
+                .data()
+                .pluck("total_item")
+                .reduce(function (acc, val) {
+                    return acc + parseFloat(val);
+                }, 0);
+            console.log(sumaTotalItem);
+
+            // Mostrar la suma en el campo de entrada
+            $("#total_max").val(sumaTotalItem);
+        });
+
+        dataTableInstance.ajax.reload(null, false);
+    }
+}
+
+  
   document.querySelector(".guardar").addEventListener("click", function () {
     event.preventDefault();
 
@@ -46,7 +129,7 @@
     })
       .then((response) => response.json())
       .then((data) => {
-        if (Array.isArray(data.message) && data.status==1) {
+        if (Array.isArray(data.message) && data.status == 1) {
           // Si hay más de un mensaje en la lista, mostrar los mensajes con SweetAlert
           const bonificacionesList = data.message.join("\n");
           Swal.fire({
@@ -57,7 +140,8 @@
             confirmButtonText: "Seguir registrando",
             cancelButtonText: "Regresar a la lista",
           }).then((result) => {
-            if (result.isConfirmed) { document.getElementById("notaVentaForm").reset();
+            if (result.isConfirmed) {
+              document.getElementById("notaVentaForm").reset();
             } else {
               window.location.href = "{% url 'lista_items_nota_venta' %}";
             }
@@ -70,8 +154,11 @@
             showCancelButton: true,
             confirmButtonText: "Seguir registrando",
             cancelButtonText: "Regresar a la lista",
-        }).then((result) => {
-            if (result.isConfirmed) { document.getElementById("notaVentaForm").reset();
+          }).then((result) => {
+            if (result.isConfirmed) {
+        
+              actualizarTabla();
+              document.getElementById("notaVentaForm").reset();
             } else {
               window.location.href = "{% url 'lista_items_nota_venta' %}";
             }
@@ -97,6 +184,111 @@
         console.error("Error:", error);
       });
   });
-</script>
 
+
+  function initializeTable() {
+    if (dataTableInstance) {
+      dataTableInstance.destroy();
+    }
+  
+  
+  dataTableInstance = $("#dataTable1").DataTable({
+    ajax: {
+      url: "{% url 'obtener_items_nota_venta' nota_venta_data.id %}",
+      dataSrc: "data", // Ajusta esto según la estructura de tu respuesta JSON
+    },
+    columns: [
+      { data: "nro_item" },
+      { data: "articulo" },
+      { data: "precio_unitario" },
+      { data: "cantidad" },
+      { data: "total_item_bruto" },
+      { data: "factor_descuento" },
+      { data: "descuento_unitario" },
+      { data: "total_item" },
+      { data: "descripcion" },
+      { data: "es_bonificacion" },
+      {
+        data: null,
+        render: function (data, type, row) {
+          return (
+            "<button onclick=\"eliminarItemNotaVenta('" +
+            row.id +
+            '\')" class="btn btn-sm"><i class="bi bi-trash"></i></button>'
+          );
+        },
+      },
+    ],
+    paging: true,
+    lengthChange: true,
+    searching: true,
+    ordering: true,
+    info: true,
+    autoWidth: false,
+    responsive: true,
+    dom: "Bflrtip",
+    buttons: ["excelHtml5"],
+    language: {
+      sProcessing: "Procesando...",
+      sLengthMenu: "Mostrar _MENU_ registros",
+      sZeroRecords: "No se encontraron resultados",
+      sEmptyTable: "Ningún dato disponible en esta tabla",
+      sInfo:
+        "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+      sInfoEmpty:
+        "Mostrando registros del 0 al 0 de un total de 0 registros",
+      sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+      sInfoPostFix: "",
+      sSearch: "Buscar:",
+      sUrl: "",
+      sInfoThousands: ",",
+      sLoadingRecords: "Cargando...",
+      oPaginate: {
+        sFirst: "Primero",
+        sLast: "Último",
+        sNext: "Siguiente",
+        sPrevious: "Anterior",
+      },
+      oAria: {
+        sSortAscending:
+          ": Activar para ordenar la columna de manera ascendente",
+        sSortDescending:
+          ": Activar para ordenar la columna de manera descendente",
+      },
+      buttons: {
+        copy: "Copiar", // Traducir "Copiar" a "Copiar" en español
+        copyTitle: "Copiado al portapapeles",
+        copySuccess: {
+          _: "%d filas copiadas",
+          1: "1 fila copiada",
+        },
+      },
+    },
+  });
+
+ 
+
+  return dataTableInstance;
+}
+   
+  function eliminarItemNotaVenta(id) {
+    $.ajax({
+      type: "POST",
+      url: `/api/api/eliminar_item_nota_venta/${id}/`,
+      success: function (response) {
+        if (response.success) {
+
+          actualizarTabla();
+          
+          console.log("Item eliminado exitosamente");
+        } else {
+          console.error("Error al eliminar el item:", response.error);
+        }
+      },
+      error: function () {
+        console.error("Error de conexión al intentar eliminar el item");
+      },
+    });
+  }
+</script>
 {% endblock %}

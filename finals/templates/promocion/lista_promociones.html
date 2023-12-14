@@ -24,8 +24,7 @@
                             <th scope="col">Fecha de Fin</th>
                             <th scope="col">Estado</th>
                             <th scope="col">Tipo Cliente</th>
-                            <th scope="col">Articulo</th>
-                            <th scope="col">Cantidad</th>
+                            <th scope="col">Tipo Promocion</th>
                            
     
                             
@@ -33,21 +32,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% comment %} {% for promocion in promociones %}
+                        {% for promocion in promociones %}
                         <tr>
                             <td>{{ promocion.descripcion }}</td>
                             <td>{{ promocion.fecha_inicio|date:'d/m/Y' }}</td>
                             <td>{{ promocion.fecha_fin|date:'d/m/Y' }}</td>
                             <td>{{ promocion.activo }}</td>
                             <td>{{ promocion.tipo_cliente }}</td>
-                            <td>{{ promocion.articulo }}</td>
-                            <td>{{ promocion.cantidad }}</td>
+                            <td>{{ promocion.tipo_promocion }}</td>
                             <td>
-                                <a href="{% url 'editar_promocion' promocion.id %}" class="btn btn-sm "><i class="bi bi-pencil"></i></a>
-                                <a href="{% url 'eliminar_promocion' promocion.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
+                                <a href="{% url 'editar_promocion' promocion.pk %}" class="btn btn-sm "><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'eliminar_promocion' promocion.pk %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
-                        {% endfor %} {% endcomment %}
+                        {% endfor %}
                     </tbody>
                 </table>
 

@@ -173,17 +173,20 @@ class VendedorForm(forms.ModelForm):
 class NotasVentaForm(forms.ModelForm):
     class Meta:
         model = NotasVenta
-        fields = '__all__'
+        fields = [
+                   'empresa',
+                   'sucursal',
+                   'tipo_pedido',
+                   'cliente',
+                   'plazo',
+                     'condicion_venta']
         widgets = {
-            'fecha_pedido': forms.TextInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
-            'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
-            'empresa': forms.Select(attrs={'class': 'form-select'}),
-            'sucursal': forms.Select(attrs={'class': 'form-select'}),
-            'tipo_pedido': forms.Select(attrs={'class': 'form-select'}),
-            'cliente': forms.Select(attrs={'class': 'form-select'}),
-            'condicion_venta': forms.Select(attrs={'class': 'form-select'}),
+            'empresa': forms.Select(attrs={'class': 'form-control'}),
+            'sucursal': forms.Select(attrs={'class': 'form-control'}),
+            'tipo_pedido': forms.Select(attrs={'class': 'form-control'}),
+            'cliente': forms.Select(attrs={'class': 'form-control'}),
+            'condicion_venta': forms.Select(attrs={'class': 'form-control'}),
             'plazo': forms.NumberInput(attrs={'class': 'form-control'}),
-            'total_pedido': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
 
@@ -192,18 +195,11 @@ class NotasVentaForm(forms.ModelForm):
 class ItemsNotaVentaForm(forms.ModelForm):
     class Meta:
         model = ItemsNotaVenta
-        fields = ['nota_venta', 'articulo', 'cantidad']
+        fields = [ 'articulo', 'cantidad']
 
         widgets = {
-            'nota_venta': forms.Select(attrs={'class': 'form-select'}),
-            # 'nro_item': forms.NumberInput(attrs={'class': 'form-control'}),
-            'articulo': forms.Select(attrs={'class': 'form-select'}),
-            # 'precio_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
+            'articulo': forms.Select(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
-            # 'total_item_bruto': forms.NumberInput(attrs={'class': 'form-control'}),
-            # 'factor_descuento': forms.NumberInput(attrs={'class': 'form-control'}),
-            # 'descuento_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
-            # 'total_item': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
 #----------------------PROMOCIONES-------------

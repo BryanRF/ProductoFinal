@@ -15,13 +15,36 @@
                 <h6 class="m-0 font-weight-bold text-primary">Agregar Nota de Venta</h6>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <form method="post">
+                    <form method="post" >
                         {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <div class="row">
+                        <div class="col-6" >
+                            <label for="{{ form.empresa.id_for_label }}">Empresa</label>
+                            {{ form.empresa }}
+                          </div>
+                          <div class="col-6" >
+                            <label for="{{ form.sucursal.id_for_label }}">Sucursal</label>
+                            {{ form.sucursal }}
+                          </div>
+                          <div class="col-4" >
+                            <label for="{{ form.tipo_pedido.id_for_label }}">Tipo Pedido</label>
+                            {{ form.tipo_pedido }}
+                          </div>
+                          <div class="col-4" >
+                            <label for="{{ form.cliente.id_for_label }}">Cliente</label>
+                            {{ form.cliente }}
+                          </div>
+                          <div class="col-4" >
+                            <label for="{{ form.plazo.id_for_label }}">Plazo</label>
+                            {{ form.plazo }}
+                          </div>
+                          <div class="col-12" >
+                            <label for="{{ form.condicion_venta.id_for_label }}">Condicion venta</label>
+                            {{ form.condicion_venta }}
+                          </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-4">Guardar</button>
                     </form>
-                </div>
             </div>
         </div>
     </div>

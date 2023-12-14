@@ -497,8 +497,12 @@ def agregar_nota_venta(request):
     if request.method == 'POST':
         form = NotasVentaForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('lista_notas_venta')
+            nota_venta = form.save()
+            # Obtén todos los datos de la nota_venta
+            nota_venta_data = {
+                'id': nota_venta.id,
+            }
+            return redirect('agregar_item_nota_venta', **nota_venta_data)
     else:
         form = NotasVentaForm()
     
@@ -527,7 +531,8 @@ def lista_items_nota_venta(request):
     items_nota_venta = ItemsNotaVenta.objects.all()
     return render(request, 'item_nota_venta/lista_items_nota_venta.html', {'items_nota_venta': items_nota_venta})
 
-def agregar_item_nota_venta(request):
+def agregar_item_nota_venta(request, id):
+    nota_venta = NotasVenta.objects.get(id=id)
     if request.method == 'POST':
         form = ItemsNotaVentaForm(request.POST)
         if form.is_valid():
@@ -536,7 +541,15 @@ def agregar_item_nota_venta(request):
     else:
         form = ItemsNotaVentaForm()
 
-    return render(request, 'item_nota_venta/agregar_editar_item_nota_venta.html', {'form': form})
+    # Puedes acceder a los valores de id, tipo_pedido y cliente aquí
+    nota_venta_data = {
+        'id': nota_venta.id,
+        'tipo_pedido': nota_venta.tipo_pedido.tipo_pedido_nombre,
+        'cliente': nota_venta.cliente.nombre_razon_social,
+        # Agrega más campos según sea necesario
+    }
+
+    return render(request, 'item_nota_venta/agregar_editar_item_nota_venta.html', {'form': form, 'nota_venta_data': nota_venta_data})
 
 def editar_item_nota_venta(request, item_id):
     item_nota_venta = get_object_or_404(ItemsNotaVenta, id=item_id)

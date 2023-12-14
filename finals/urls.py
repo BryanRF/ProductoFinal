@@ -92,7 +92,10 @@ urlpatterns = [
 #-----------------------ITEM Notas Ventas--------------
 
 path('lista_items_nota_venta/', lista_items_nota_venta, name='lista_items_nota_venta'),
-    path('agregar_item_nota_venta/', agregar_item_nota_venta, name='agregar_item_nota_venta'),
+    # path('agregar_item_nota_venta/', agregar_item_nota_venta, name='agregar_item_nota_venta'),
+
+    path('agregar_item_nota_venta/<uuid:id>/', agregar_item_nota_venta, name='agregar_item_nota_venta'),
+
     path('editar_item_nota_venta/<uuid:item_id>/', editar_item_nota_venta, name='editar_item_nota_venta'),
     path('eliminar_item_nota_venta/<uuid:item_id>/', eliminar_item_nota_venta, name='eliminar_item_nota_venta'),
 

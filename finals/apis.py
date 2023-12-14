@@ -12,7 +12,7 @@ from .models import Promocion, Promocion_articulos_asociados, Promocion_articulo
 from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime
-
+from django.views.decorators.http import require_POST
 @csrf_exempt
 def promocion_list_create(request):
     try:
@@ -157,3 +157,43 @@ class ItemsNotaVentaAPIView(APIView):
         
         
     
+def obtener_items_nota_venta(request, nota_venta_id):
+    # Filtra los ItemsNotaVenta por la nota_venta específica
+    items = ItemsNotaVenta.objects.filter(nota_venta__id=nota_venta_id)
+
+    # Construye los datos en el formato requerido por DataTables
+    data = [
+        {
+            'id': item.id,
+            'nro_item': item.nro_item,
+            'articulo': item.articulo.descripcion,  # Cambia esto según la estructura real de tu modelo Articulo
+            'precio_unitario': item.articulo.precio_unitario,  # Cambia esto según la estructura real de tu modelo Articulo
+            'cantidad': item.cantidad,
+            'total_item_bruto': float(item.total_item_bruto),
+            'factor_descuento': float(item.factor_descuento),
+            'descuento_unitario': float(item.descuento_unitario),
+            'descripcion': item.descripcion if item.descripcion is not None and item.descripcion != '' else '- -',
+            'es_bonificacion': 'Si' if item.es_bonificacion == 1 else 'No',
+            'total_item': float(item.total_item),
+        }
+        for item in items
+    ]
+
+    # Crear el diccionario de respuesta con las claves requeridas por DataTables
+    response_data = {
+        'draw': 0,  # Puedes ajustar esto según tus necesidades
+        'recordsTotal': items.count(),
+        'recordsFiltered': items.count(),
+        'data': data,
+    }
+
+    return JsonResponse(response_data)
+@csrf_exempt  # Esto es solo para este ejemplo, asegúrate de manejar la protección CSRF de manera adecuada en un entorno de producción
+@require_POST
+def eliminar_item_nota_venta_api(request, item_id):
+    try:
+        item = ItemsNotaVenta.objects.get(id=item_id)
+        item.delete()
+        return JsonResponse({'success': True})
+    except ItemsNotaVenta.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'El item de la nota de venta no existe'})

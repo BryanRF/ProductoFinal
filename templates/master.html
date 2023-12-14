@@ -24,7 +24,22 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.css" rel="stylesheet">
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+
+
+        <!-- Page level plugins -->
+        <script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+        <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+        <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.js"></script>
 </head>
 
 <body id="page-top">
@@ -154,12 +169,7 @@
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="{% url "lista_items_nota_venta" %}">
-                    <i class="fas fa-light fa-street-view"></i>
-                    <span>ITEM Nota Ventas</span>
-                </a>
-            </li>
+     
 
             <li class="nav-item">
                 <a class="nav-link" href="{% url "lista_promociones" %}">
@@ -447,6 +457,7 @@
         <!-- Page level plugins -->
         <script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
         <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+        <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.js"></script>
     
         <!-- Page level custom scripts -->
         <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
