@@ -2,13 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status,generics
 from django.http import JsonResponse
-
 from .models import *
 from .serializers import *
-
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Promocion, Promocion_articulos_asociados, Promocion_articulos_bonificados
 from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime
@@ -92,13 +89,10 @@ class ItemsNotaVentaAPIView(APIView):
             id_articulo = request.data.get('articulo')
             cantidad_comprada = self.serializer.validated_data['cantidad']
             self.nota_venta = NotasVenta.objects.get(pk=request.data.get('nota_venta'))
-            
             self.caso1(id_articulo, cantidad_comprada)
             self.caso2(id_articulo, cantidad_comprada)
-            # Unir los mensajes en una cadena antes de asignarlos a 'descripcion'
+            self.caso3(id_articulo, cantidad_comprada)
             self.serializer.validated_data['descripcion'] = ", ".join(self.messages)
-            
-
             data = {'message':  self.get_messages(), 'status':self.serializer.validated_data['es_bonificacion']}
             self.serializer.save()
             return JsonResponse(data, status=200)
@@ -109,54 +103,245 @@ class ItemsNotaVentaAPIView(APIView):
         return self.messages if len(self.messages) > 0 else ["Venta registrada exitosamente"]
     
     def caso1(self, id_articulo, cantidad_comprada):
-        bonificacion = self.calcular_bonificacion(id_articulo, cantidad_comprada)
-        self.serializer.validated_data['es_bonificacion'] = '1' if bonificacion > 0 else '0'
-    def calcular_bonificacion(self, id_articulo, cantidad_comprada):
-        articulo = Articulo.objects.get(pk=id_articulo)
-        if articulo.codigo_sku == '203101':
-            articulo_value = Articulo.objects.get(codigo_sku='200101B')
-            if cantidad_comprada == 48:
-                ItemsNotaVenta.objects.create(
-                    articulo=articulo_value,
-                    nota_venta= self.nota_venta,
-                    cantidad=2,  
-                    descripcion=f'Bonificacion por la compra de 48 {articulo.descripcion}',
-                    descuento_unitario=100,  # Ajusta el descuento unitario según sea necesario
-                    es_bonificacion=1,  # No es una bonificación según la solicitud
-                )
-                self.add_message(f"Tu venta a sido bonificada con 2 {articulo_value.descripcion}")
-                return 1
-            else:
-                return 0
-        else:
-            return 0
+        try:
+            articulo = Articulo.objects.get(pk=id_articulo)
+        except Articulo.DoesNotExist:
+            return
+        promocion = Promocion.objects.filter(
+            tipo_promocion='caso_1',
+            tipo_cliente=self.nota_venta.cliente.canal_cliente,
+            articulo_aplicable=articulo,
+            cantidad_minima_compra__lte=cantidad_comprada,
+            activo=True
+        ).first()
+        if promocion:
+            cantidad_bonificada = promocion.unidades_bonificadas
+            mensaje= f"Tu venta ha sido bonificada con {cantidad_bonificada} {promocion.articulo_bonificacion.descripcion}"
+            ItemsNotaVenta.objects.create(
+                articulo=promocion.articulo_bonificacion,
+                nota_venta=self.nota_venta,
+                cantidad=cantidad_bonificada,
+                descripcion=mensaje,
+                descuento_unitario=100,  # Ajusta el descuento unitario según sea necesario
+                es_bonificacion=1,
+            )
+            self.add_message(mensaje)
         
     def caso2(self, id_articulo, cantidad_comprada):
-        bonificacion = self.calcular_bonificacion(id_articulo, cantidad_comprada)
-        self.serializer.validated_data['es_bonificacion'] = '1' if bonificacion > 0 else '0'
-    def calcular_bonificacion(self, id_articulo, cantidad_comprada):
-        articulo = Articulo.objects.get(pk=id_articulo)
-        if articulo.codigo_sku == '203101':
-            articulo_value = Articulo.objects.get(codigo_sku='200101B')
-            if cantidad_comprada == 48:
+        try:
+            articulo = Articulo.objects.get(pk=id_articulo)
+        except Articulo.DoesNotExist:
+            return
+        promocion = Promocion.objects.filter(
+            tipo_promocion='caso_2',
+            tipo_cliente=self.nota_venta.cliente.canal_cliente,
+            proveedor=articulo.grupo,  # Suponiendo que 'grupo' en Articulo es el proveedor
+            monto_minimo__lte=cantidad_comprada * articulo.precio_unitario,
+            activo=True
+        ).order_by('-monto_minimo').first()
+
+        if promocion:
+            porcentaje_descuento = promocion.porcentaje_descuento
+            descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
+            mensaje = f"Por la compra de S/{cantidad_comprada * articulo.precio_unitario:.2f} en productos del proveedor {articulo.grupo}, se otorga un descuento del {porcentaje_descuento}%."
+            ItemsNotaVenta.objects.create(
+                articulo=articulo,
+                nota_venta=self.nota_venta,
+                cantidad=cantidad_comprada,
+                descripcion=mensaje,
+                descuento_unitario=descuento_monto,
+                es_bonificacion=0,
+            )
+            self.add_message(mensaje)
+        
+    def caso3(self, id_articulo, cantidad_comprada):
+        try:
+            articulo = Articulo.objects.get(pk=id_articulo)
+        except Articulo.DoesNotExist:
+            return
+        promocion_asociada = Promocion_articulos_asociados.objects.filter(
+            promocion__tipo_promocion='caso_3',
+            promocion__tipo_cliente=self.nota_venta.cliente.canal_cliente,
+            articulo=articulo,
+            cantidad_articulo__lte=cantidad_comprada,
+            promocion__activo=True
+        ).order_by('-cantidad_articulo').first()
+        if promocion_asociada:
+            promocion = promocion_asociada.promocion
+            porcentaje_descuento = promocion.porcentaje_descuento
+            descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
+            mensaje = f"Por la compra de más de {promocion_asociada.cantidad_articulo} unidades de {articulo.descripcion}, se obtiene un descuento del {porcentaje_descuento}%."
+            ItemsNotaVenta.objects.create(
+                articulo=articulo,
+                nota_venta=self.nota_venta,
+                cantidad=cantidad_comprada,
+                descripcion=mensaje,
+                descuento_unitario=descuento_monto,
+                es_bonificacion=0,
+            )
+            self.add_message(mensaje)        
+    def caso4(self, id_articulo, cantidad_comprada):
+        try:
+            articulo = Articulo.objects.get(pk=id_articulo)
+        except Articulo.DoesNotExist:
+            return
+        promocion_asociada = Promocion_articulos_asociados.objects.filter(
+            promocion__tipo_promocion='caso_4',
+            articulo=articulo,
+            promocion__activo=True
+        ).order_by('-cantidad_articulo').first()
+        min = promocion_asociada.promocion.cantidad_minima_compra
+        max = promocion_asociada.promocion.cantidad_minima_compra
+        if promocion_asociada and (min <= cantidad_comprada <= max):
+            porcentaje_descuento = promocion_asociada.promocion.porcentaje_descuento
+            descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
+            mensaje = f"Por la compra de {cantidad_comprada} unidades de {articulo.descripcion}, se obtiene un descuento del {porcentaje_descuento}%."
+            ItemsNotaVenta.objects.create(
+                articulo=articulo,
+                nota_venta=self.nota_venta,
+                cantidad=cantidad_comprada,
+                descripcion=mensaje,
+                descuento_unitario=descuento_monto,
+                es_bonificacion=0,
+            )
+            self.add_message(mensaje)
+    def caso5(self, id_articulo, cantidad_comprada):
+        try:
+            articulo = Articulo.objects.get(pk=id_articulo)
+        except Articulo.DoesNotExist:
+            return
+
+        promocion = Promocion.objects.filter(
+            tipo_promocion='caso_5',
+            tipo_cliente=self.nota_venta.cliente.canal_cliente,
+            articulo_aplicable=articulo,
+            activo=True
+        ).first()
+
+        if promocion:
+            importe_compra = cantidad_comprada * articulo.precio_unitario
+            monto_min = promocion.monto_minimo
+            monto_max = promocion.monto_maximo
+
+            if monto_min <= importe_compra <= monto_max:
+                porcentaje_descuento = promocion.porcentaje_descuento
+                descuento_monto = importe_compra * (porcentaje_descuento / 100)
+                mensaje = f"Por la compra de un importe de S/{importe_compra:.2f} en {articulo.descripcion}, se obtiene un descuento del {porcentaje_descuento}%."
                 ItemsNotaVenta.objects.create(
-                    articulo=articulo_value,
-                    nota_venta= self.nota_venta,
-                    cantidad=2,  
-                    descripcion=f'Bonificacion por la compra de 48 {articulo.descripcion}',
-                    descuento_unitario=100,  # Ajusta el descuento unitario según sea necesario
-                    es_bonificacion=1,  # No es una bonificación según la solicitud
+                    articulo=articulo,
+                    nota_venta=self.nota_venta,
+                    cantidad=cantidad_comprada,
+                    descripcion=mensaje,
+                    descuento_unitario=descuento_monto,
+                    es_bonificacion=0,
                 )
-                self.add_message(f"Tu venta a sido bonificada con 2 {articulo_value.descripcion}")
-                return 1
-            else:
-                return 0
-        else:
-            return 0
-        
-        
-        
-    
+                self.add_message(mensaje)
+
+    def caso7(self, id_articulo, cantidad_comprada):
+        try:
+            articulo = Articulo.objects.get(pk=id_articulo)
+        except Articulo.DoesNotExist:
+            return
+
+        promocion = Promocion.objects.filter(
+            tipo_promocion='caso_7',
+            tipo_cliente=self.nota_venta.cliente.canal_cliente,
+            articulo_aplicable=articulo,
+            activo=True
+        ).first()
+
+        if promocion:
+            cantidad_minima_compra = promocion.cantidad_minima_compra
+            unidades_bonificadas = promocion.unidades_bonificadas
+
+            if cantidad_comprada >= cantidad_minima_compra:
+                mensaje = f"Por la compra de {cantidad_comprada} unidades de {articulo.descripcion}, se bonifican {unidades_bonificadas} unidades de {promocion.articulo_bonificacion.descripcion}."
+                ItemsNotaVenta.objects.create(
+                    articulo=promocion.articulo_bonificacion,
+                    nota_venta=self.nota_venta,
+                    cantidad=unidades_bonificadas,
+                    descripcion=mensaje,
+                    es_bonificacion=1,
+                )
+
+                self.add_message(mensaje)
+
+    def caso8(self, id_articulo, cantidad_comprada):
+        try:
+            articulo = Articulo.objects.get(pk=id_articulo)
+        except Articulo.DoesNotExist:
+            return
+
+        promocion = Promocion.objects.filter(
+            tipo_promocion='caso_8',
+            tipo_cliente=self.nota_venta.cliente.canal_cliente,
+            articulo_aplicable=articulo,
+            activo=True
+        ).first()
+
+        if promocion:
+            cantidad_minima_compra = promocion.cantidad_minima_compra
+
+            if cantidad_comprada >= cantidad_minima_compra:
+                mensaje = f"Por la compra de {cantidad_comprada} unidades de {articulo.descripcion}, se bonifican los siguientes productos:"
+
+                for bonificacion in promocion.promocion_articulos_bonificados.all():
+                    ItemsNotaVenta.objects.create(
+                        articulo=bonificacion.articulo,
+                        nota_venta=self.nota_venta,
+                        cantidad=bonificacion.cantidad_articulo,
+                        descripcion=f"{bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion}",
+                        es_bonificacion=1,
+                    )
+
+                    mensaje += f" {bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion},"
+
+                self.add_message(mensaje[:-1])
+                
+    def caso9(self, id_articulo, cantidad_comprada):
+        try:
+            articulo = Articulo.objects.get(pk=id_articulo)
+        except Articulo.DoesNotExist:
+            return
+
+        promocion = Promocion.objects.filter(
+            tipo_promocion='caso_9',
+            tipo_cliente=self.nota_venta.cliente.canal_cliente,
+            articulo_aplicable=articulo,
+            activo=True
+        ).first()
+
+        if promocion:
+            importe_compra = cantidad_comprada * articulo.precio_unitario
+
+            if promocion.monto_minimo <= importe_compra <= promocion.monto_maximo:
+                mensaje = f"Por la compra de un importe de S/{importe_compra:.2f} en {articulo.descripcion}, se obtiene la siguiente promoción combinada:"
+                for bonificacion in promocion.promocion_articulos_bonificados.all():
+                    ItemsNotaVenta.objects.create(
+                        articulo=bonificacion.articulo,
+                        nota_venta=self.nota_venta,
+                        cantidad=bonificacion.cantidad_articulo,
+                        descripcion=f"{bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion}",
+                        es_bonificacion=1,
+                    )
+                    mensaje += f" {bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion},"
+
+                # Descuento
+                porcentaje_descuento = promocion.porcentaje_descuento
+                descuento_monto = importe_compra * (porcentaje_descuento / 100)
+                mensaje += f" y se aplica un descuento del {porcentaje_descuento}%."
+
+                ItemsNotaVenta.objects.create(
+                    articulo=articulo,
+                    nota_venta=self.nota_venta,
+                    cantidad=cantidad_comprada,
+                    descripcion=f"Descuento del {porcentaje_descuento}% aplicado a {cantidad_comprada} unidades de {articulo.descripcion}.",
+                    descuento_unitario=descuento_monto,
+                    es_bonificacion=0,
+                )
+
+                self.add_message(mensaje)
+
 def obtener_items_nota_venta(request, nota_venta_id):
     # Filtra los ItemsNotaVenta por la nota_venta específica
     items = ItemsNotaVenta.objects.filter(nota_venta__id=nota_venta_id)

@@ -259,8 +259,6 @@ class Promocion(models.Model):
 
     def estado_activo(self):
         return "Activo" if self.activo else "Inactivo"
-
-
     def __str__(self):
         return self.descripcion
 
