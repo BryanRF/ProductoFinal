@@ -41,7 +41,11 @@
                             <td>{{ promocion.tipo_cliente }}</td>
                             <td>{{ promocion.tipo_promocion }}</td>
                             <td>
-                                <a href="{% url 'editar_promocion' promocion.pk %}" class="btn btn-sm "><i class="bi bi-pencil"></i></a>
+                                <button class="btn btn-sm" onclick="activarInactivarPromocion('{{ promocion.pk }}', '{{ promocion.activo }}','{% url "activar_inactivar_promocion" pk=promocion.pk %}' ,'{{ promocion.fecha_inicio|date:'Y-m-d' }}', '{{ promocion.fecha_fin|date:'Y-m-d' }}')">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                
+                                
                                 <a href="{% url 'eliminar_promocion' promocion.pk %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
@@ -55,6 +59,88 @@
     </div>
 </div>
 
+<!-- Agrega el script para la función JavaScript -->
+<script>
+    function activarInactivarPromocion(pk, estadoActual,url, fechaInicioActual, fechaFinActual) {
+        const nuevoEstado = estadoActual === 'True' ? 'false' : 'true';
+    
+        // Creamos un formulario HTML dentro de SweetAlert
+        const formHtml = `
+        <form id="activarInactivarForm">
+            <div class="form-group">
+                <label for="fechaInicio">Fecha de Inicio:</label>
+                <input type="date" class="form-control" id="fechaInicio" value="${fechaInicioActual}" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="fechaFin">Fecha de Fin:</label>
+                <input type="date" class="form-control" id="fechaFin" value="${fechaFinActual}" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="estado">Estado:</label>
+                <select class="form-control" id="estado" required>
+                    <option value="true" ${nuevoEstado === 'true' ? 'selected' : ''}>Activar</option>
+                    <option value="false" ${nuevoEstado === 'false' ? 'selected' : ''}>Desactivar</option>
+                </select>
+            </div>
+        </form>
+        `;
+
+        Swal.fire({
+            title: 'Configurar Promoción',
+            html: formHtml,
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                // Devuelve un objeto con los valores del formulario
+                return {
+                    fechaInicio: document.getElementById('fechaInicio').value,
+                    fechaFin: document.getElementById('fechaFin').value,
+                    estado: document.getElementById('estado').value,
+                };
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const { fechaInicio, fechaFin, estado } = result.value;
+
+                // Realiza la llamada a la API para activar/inactivar con fechas
+                fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        fechaInicio,
+                        fechaFin,
+                        activo: estado === 'true',
+                    }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                  
+
+                        Swal.fire({
+                            title: '¡Hecho!',
+                            text:  `La promoción ha sido ${data.activo ? 'activada' : 'desactivada'} correctamente.`,
+                            icon:  'success' ,
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed ) {
+                                location.reload();
+                            }
+                        });
+
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error', 'Hubo un error al procesar la solicitud.', 'error');
+                    });
+            }
+        });
+    }
+</script>
 
 
 <script>

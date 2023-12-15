@@ -13,7 +13,7 @@
   <div class="card shadow mb-4">
     <div class="card-header py-3">
       <h6 class="m-0 font-weight-bold text-primary">
-        <p>Cliente: {{ nota_venta_data.cliente }}</p>
+        <p>Cliente: {{ nota_venta_data.cliente }} - {{ nota_venta_data.tipo_cliente }}</p>
       </h6>
     </div>
     <div class="card-body">
@@ -45,19 +45,23 @@
       <h6 class="m-0 font-weight-bold text-primary">Lista de items</h6>
       <hr>
      
-<div id="totalMaxContainer row">
-  <label for="total_max">Monto a pagar total</label>
-  <input
-
-    type="number"
-    readonly
-    min="0"
-    value="0"
-    class="form-control col-6"
-    id="total_max"
-  />
-</div>
-
+      <div class=" mt-3">
+            <div class="col-6">
+              <label for="total_max">Monto a pagar total</label>
+                <div class="input-group">
+                    <input
+                        type="number"
+                        readonly
+                        min="0"
+                        value="0"
+                        class="form-control"
+                        id="total_max"
+                    />
+                    <button type="button" id="confirmarVenta" class="btn btn-success">Confirmar Venta</button>
+                </div>
+            </div>
+    </div>
+    
     </div>
     <div class="card-body">
       <table
@@ -68,14 +72,14 @@
       >
         <thead>
           <tr>
-            <th scope="col">Nro. Item</th>
+            <th scope="col">Nro.</th>
             <th scope="col">Artículo</th>
             <th scope="col">Precio Unitario</th>
             <th scope="col">Cantidad</th>
-            <th scope="col">Total Item Bruto</th>
-            <th scope="col">Factor Descuento</th>
-            <th scope="col">Descuento Unitario</th>
-            <th scope="col">Total Item</th>
+            <th scope="col">Total sin Descuento</th>
+            <th scope="col">Ahorro</th>
+            <th scope="col">Descuento%</th>
+            <th scope="col">SubTotal</th>
             <th scope="col">Descripcion Bonificación</th>
             <th scope="col">Es Bonificacion</th>
             <th scope="col">Acciones</th>
@@ -150,19 +154,18 @@
           Swal.fire({
             icon: "success",
             title: "Éxito",
-            text: data.message[0], // Tomar el primer mensaje si es una lista
+            html: construirListaMensajes(data.message),
             showCancelButton: true,
             confirmButtonText: "Seguir registrando",
-            cancelButtonText: "Regresar a la lista",
-          }).then((result) => {
+            cancelButtonText: "Terminar Venta",
+        }).then((result) => {
             if (result.isConfirmed) {
-        
-              actualizarTabla();
-              document.getElementById("notaVentaForm").reset();
+                actualizarTabla();
+                document.getElementById("notaVentaForm").reset();
             } else {
-              window.location.href = "{% url 'lista_items_nota_venta' %}";
+              confirmarVenta();
             }
-          });
+        });
         }
       })
       .catch((error) => {
@@ -184,7 +187,14 @@
         console.error("Error:", error);
       });
   });
-
+  function construirListaMensajes(mensajes) {
+    let listaMensajes = "<ul>";
+    mensajes.forEach((mensaje, index) => {
+        listaMensajes += `<li>${mensaje}</li>`;
+    });
+    listaMensajes += "</ul>";
+    return listaMensajes;
+}
 
   function initializeTable() {
     if (dataTableInstance) {
@@ -291,4 +301,53 @@
     });
   }
 </script>
+
+
+<script>
+  document.getElementById('confirmarVenta').addEventListener('click', function() {
+    confirmarVenta();
+  
+     
+  });
+  function confirmarVenta(){
+    Swal.fire({
+      title: 'Confirmar venta',
+      text: '¿Estás seguro de confirmar la venta?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, confirmar',
+      cancelButtonText: 'Cancelar',
+  }).then((result) => {
+      if (result.isConfirmed) {
+          fetch(`{% url 'confirmar_nota_venta' nota_venta_data.id %}`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': '{{ csrf_token }}',  // Asegúrate de tener el token CSRF
+              },
+          })
+          .then(response => response.json())
+          .then(data => {
+
+              Swal.fire({
+                title: '¡Éxito!',
+                  text: data.message,
+                  icon: 'success',
+            }).then((result) => {
+                if (result.isConfirmed ) {
+                  window.location.href = '{% url "lista_notas_venta" %}';
+                }
+            });
+
+              // Puedes realizar otras acciones aquí según la respuesta del servidor
+          })
+          .catch(error => {
+              console.error('Error al confirmar la venta:', error);
+              // Manejar errores según tus necesidades
+          });
+      }
+  }); 
+  }
+  </script>
+  
 {% endblock %}

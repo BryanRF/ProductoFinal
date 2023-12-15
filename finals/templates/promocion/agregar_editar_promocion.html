@@ -429,7 +429,7 @@
           break;
         case "caso_2":
           $(
-            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin ,#div_monto_minimo, #div_porcentaje_descuento,#div_tipo_cliente"
+            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin,#div_proveedor ,#div_monto_minimo, #div_porcentaje_descuento,#div_tipo_cliente"
           ).show();
           break;
         case "caso_3":
@@ -495,6 +495,17 @@
         .then(response => response.json())
         .then(data => {
             console.log('Respuesta del servidor:', data);
+            Swal.fire({
+              title: data.ok ? '¡Éxito!' : 'Error',
+              text: data.message,
+              icon: data.ok ? 'success' : 'warning',
+              confirmButtonText: 'Aceptar',
+          }).then((result) => {
+              if (result.isConfirmed ) {
+                  location.reload();
+              }
+          });
+          
         })
         .catch(error => {
             console.error('Error en la solicitud fetch:', error);
@@ -520,4 +531,7 @@
         return articulosSeleccionados;
     }
 </script>
+
+
+
 {% endblock %}

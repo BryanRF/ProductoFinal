@@ -184,16 +184,24 @@ class ItemsNotaVenta(models.Model):
     articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE)
     cantidad = models.DecimalField(max_digits=12, decimal_places=2)
     total_item_bruto = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
-    factor_descuento = models.DecimalField(max_digits=12, decimal_places=3 , default=0)
+    factor_descuento = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
     descuento_unitario = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
     total_item = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
-    es_bonificacion = models.CharField(max_length=1 , default=0)
+    es_bonificacion = models.BooleanField(default=False)
+
+    def calcular_factor_descuento(self):
+        precio_unitario = self.articulo.precio_unitario
+        total_sin_descuento = precio_unitario * self.cantidad
+        total_con_descuento = total_sin_descuento - self.total_item
+        self.factor_descuento =total_con_descuento
     def calcular_total_item(self):
         self.total_item_bruto = (self.articulo.precio_unitario) * self.cantidad
         descuento = (self.articulo.precio_unitario * self.descuento_unitario) / 100
         self.total_item = (self.articulo.precio_unitario - descuento) * self.cantidad
+
     def save(self, *args, **kwargs):
         self.calcular_total_item()
+        self.calcular_factor_descuento()  # Calcula el factor de descuento antes de guardar
         if not self.nro_item and self.nota_venta:
             ultimo_item = ItemsNotaVenta.objects.filter(nota_venta=self.nota_venta).order_by('-nro_item').first()
             if ultimo_item:
@@ -206,28 +214,6 @@ class ItemsNotaVenta(models.Model):
     
 
     #-----------PROMOCIONES-------------
-class Promocion(models.Model):
-
-    ESTADO_CHOICES = [
-        (True, 'Activo'),
-        (False, 'Inactivo'),
-    ]
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    descripcion = models.CharField(max_length=100)
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-    activo = models.BooleanField()
-    tipo_cliente = models.ForeignKey(CanalCliente, on_delete=models.CASCADE, related_name='promociones')
-    articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='promociones', null=True, blank=True)
-    cantidad = models.PositiveIntegerField(default=0)
-
-    def estado_activo(self):
-        if self.activo:
-            return "Activo"
-        else:
-            return "Inactivo"
-    def __str__(self):
-        return self.descripcion
 
 class Promocion(models.Model):
     TIPO_PROMOCION_CHOICES = [

@@ -546,7 +546,7 @@ def agregar_item_nota_venta(request, id):
         'id': nota_venta.id,
         'tipo_pedido': nota_venta.tipo_pedido.tipo_pedido_nombre,
         'cliente': nota_venta.cliente.nombre_razon_social,
-        # Agrega más campos según sea necesario
+        'tipo_cliente': nota_venta.cliente.canal_cliente.canal_cliente_descripcion,
     }
 
     return render(request, 'item_nota_venta/agregar_editar_item_nota_venta.html', {'form': form, 'nota_venta_data': nota_venta_data})

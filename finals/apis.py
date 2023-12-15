@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime
+from decimal import Decimal
 from django.views.decorators.http import require_POST
 @csrf_exempt
 def promocion_list_create(request):
@@ -44,6 +45,7 @@ def promocion_list_create(request):
                 proveedor_id=proveedor_id,
                 articulo_aplicable_id=articulo_aplicable_id,
                 articulo_bonificacion_id=articulo_bonificacion_id,
+                activo=True,
             )
 
             articulos_asociados = data.get('articulosSeleccionadosModal', [])
@@ -86,6 +88,7 @@ class ItemsNotaVentaAPIView(APIView):
     def post(self, request, *args, **kwargs):
         self.serializer = ItemsNotaVentaSerializer (data=request.data)
         if self.serializer.is_valid():
+            self.serializer.save()
             id_articulo = request.data.get('articulo')
             cantidad_comprada = self.serializer.validated_data['cantidad']
             self.nota_venta = NotasVenta.objects.get(pk=request.data.get('nota_venta'))
@@ -98,7 +101,7 @@ class ItemsNotaVentaAPIView(APIView):
             self.caso8(id_articulo, cantidad_comprada)
             self.caso9(id_articulo, cantidad_comprada)
             self.serializer.validated_data['descripcion'] = ", ".join(self.messages)
-            data = {'message':  self.get_messages(), 'status':self.serializer.validated_data['es_bonificacion']}
+            data = {'message':  self.get_messages(), 'descripcion':self.serializer.validated_data['descripcion']}
             self.serializer.save()
             return JsonResponse(data, status=200)
         return Response(self.serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -116,9 +119,10 @@ class ItemsNotaVentaAPIView(APIView):
             tipo_promocion='caso_1',
             tipo_cliente=self.nota_venta.cliente.canal_cliente,
             articulo_aplicable=articulo,
-            cantidad_minima_compra__lte=cantidad_comprada,
+            cantidad_minima_compra=cantidad_comprada*articulo.precio_unitario,
             activo=True
         ).first()
+        print(promocion)
         if promocion:
             cantidad_bonificada = promocion.unidades_bonificadas
             mensaje= f"Tu venta ha sido bonificada con {cantidad_bonificada} {promocion.articulo_bonificacion.descripcion}"
@@ -126,9 +130,8 @@ class ItemsNotaVentaAPIView(APIView):
                 articulo=promocion.articulo_bonificacion,
                 nota_venta=self.nota_venta,
                 cantidad=cantidad_bonificada,
-                descripcion=mensaje,
                 descuento_unitario=100,  # Ajusta el descuento unitario según sea necesario
-                es_bonificacion=1,
+                es_bonificacion=True,
             )
             self.add_message(mensaje)
         
@@ -140,24 +143,23 @@ class ItemsNotaVentaAPIView(APIView):
         promocion = Promocion.objects.filter(
             tipo_promocion='caso_2',
             tipo_cliente=self.nota_venta.cliente.canal_cliente,
-            proveedor=articulo.grupo,  # Suponiendo que 'grupo' en Articulo es el proveedor
-            monto_minimo__lte=cantidad_comprada * articulo.precio_unitario,
+            proveedor=articulo.grupo,  #busca por proveedor
             activo=True
-        ).order_by('-monto_minimo').first()
+        ).first()
 
-        if promocion:
-            porcentaje_descuento = promocion.porcentaje_descuento
-            descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
-            mensaje = f"Por la compra de S/{cantidad_comprada * articulo.precio_unitario:.2f} en productos del proveedor {articulo.grupo}, se otorga un descuento del {porcentaje_descuento}%."
-            ItemsNotaVenta.objects.create(
-                articulo=articulo,
-                nota_venta=self.nota_venta,
-                cantidad=cantidad_comprada,
-                descripcion=mensaje,
-                descuento_unitario=descuento_monto,
-                es_bonificacion=0,
-            )
-            self.add_message(mensaje)
+        if promocion :
+            if promocion.monto_minimo >= (cantidad_comprada * articulo.precio_unitario):
+                porcentaje_descuento = promocion.porcentaje_descuento
+                descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
+                mensaje = f"Por la compra de S/{cantidad_comprada * articulo.precio_unitario:.2f} en productos del proveedor {articulo.grupo}, se otorga un descuento del {porcentaje_descuento}%."
+                ItemsNotaVenta.objects.create(
+                    articulo=articulo,
+                    nota_venta=self.nota_venta,
+                    cantidad=cantidad_comprada,
+                    descuento_unitario=porcentaje_descuento,
+                    es_bonificacion=True,
+                )
+                self.add_message(mensaje)
         
     def caso3(self, id_articulo, cantidad_comprada):
         try:
@@ -168,23 +170,22 @@ class ItemsNotaVentaAPIView(APIView):
             promocion__tipo_promocion='caso_3',
             promocion__tipo_cliente=self.nota_venta.cliente.canal_cliente,
             articulo=articulo,
-            cantidad_articulo__lte=cantidad_comprada,
             promocion__activo=True
         ).order_by('-cantidad_articulo').first()
         if promocion_asociada:
-            promocion = promocion_asociada.promocion
-            porcentaje_descuento = promocion.porcentaje_descuento
-            descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
-            mensaje = f"Por la compra de más de {promocion_asociada.cantidad_articulo} unidades de {articulo.descripcion}, se obtiene un descuento del {porcentaje_descuento}%."
-            ItemsNotaVenta.objects.create(
-                articulo=articulo,
-                nota_venta=self.nota_venta,
-                cantidad=cantidad_comprada,
-                descripcion=mensaje,
-                descuento_unitario=descuento_monto,
-                es_bonificacion=0,
-            )
-            self.add_message(mensaje)        
+            if  promocion_asociada.cantidad_articulo<=cantidad_comprada:
+                promocion = promocion_asociada.promocion
+                porcentaje_descuento = promocion.porcentaje_descuento
+                descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
+                mensaje = f"Por la compra de más de {promocion_asociada.cantidad_articulo} unidades de {articulo.descripcion}, se obtiene un descuento del {porcentaje_descuento}%."
+                ItemsNotaVenta.objects.create(
+                    articulo=articulo,
+                    nota_venta=self.nota_venta,
+                    cantidad=cantidad_comprada,
+                    descuento_unitario=porcentaje_descuento,
+                    es_bonificacion=True,
+                )
+                self.add_message(mensaje)        
     def caso4(self, id_articulo, cantidad_comprada):
         try:
             articulo = Articulo.objects.get(pk=id_articulo)
@@ -195,21 +196,22 @@ class ItemsNotaVentaAPIView(APIView):
             articulo=articulo,
             promocion__activo=True
         ).order_by('-cantidad_articulo').first()
-        min = promocion_asociada.promocion.cantidad_minima_compra
-        max = promocion_asociada.promocion.cantidad_minima_compra
-        if promocion_asociada and (min <= cantidad_comprada <= max):
-            porcentaje_descuento = promocion_asociada.promocion.porcentaje_descuento
-            descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
-            mensaje = f"Por la compra de {cantidad_comprada} unidades de {articulo.descripcion}, se obtiene un descuento del {porcentaje_descuento}%."
-            ItemsNotaVenta.objects.create(
-                articulo=articulo,
-                nota_venta=self.nota_venta,
-                cantidad=cantidad_comprada,
-                descripcion=mensaje,
-                descuento_unitario=descuento_monto,
-                es_bonificacion=0,
-            )
-            self.add_message(mensaje)
+        
+        if promocion_asociada :
+            min = promocion_asociada.promocion.cantidad_minima_compra
+            max = promocion_asociada.promocion.cantidad_minima_compra
+            if (min <= cantidad_comprada <= max):
+                porcentaje_descuento = promocion_asociada.promocion.porcentaje_descuento
+                descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
+                mensaje = f"Por la compra de {cantidad_comprada} unidades de {articulo.descripcion}, se obtiene un descuento del {porcentaje_descuento}%."
+                ItemsNotaVenta.objects.create(
+                    articulo=articulo,
+                    nota_venta=self.nota_venta,
+                    cantidad=cantidad_comprada,
+                    descuento_unitario=porcentaje_descuento,
+                    es_bonificacion=True,
+                )
+                self.add_message(mensaje)
     def caso5(self, id_articulo, cantidad_comprada):
         try:
             articulo = Articulo.objects.get(pk=id_articulo)
@@ -236,9 +238,8 @@ class ItemsNotaVentaAPIView(APIView):
                     articulo=articulo,
                     nota_venta=self.nota_venta,
                     cantidad=cantidad_comprada,
-                    descripcion=mensaje,
-                    descuento_unitario=descuento_monto,
-                    es_bonificacion=0,
+                    descuento_unitario=porcentaje_descuento,
+                    es_bonificacion=True,
                 )
                 self.add_message(mensaje)
 
@@ -265,8 +266,7 @@ class ItemsNotaVentaAPIView(APIView):
                     articulo=promocion.articulo_bonificacion,
                     nota_venta=self.nota_venta,
                     cantidad=unidades_bonificadas,
-                    descripcion=mensaje,
-                    es_bonificacion=1,
+                    es_bonificacion=True,
                 )
 
                 self.add_message(mensaje)
@@ -296,7 +296,7 @@ class ItemsNotaVentaAPIView(APIView):
                         nota_venta=self.nota_venta,
                         cantidad=bonificacion.cantidad_articulo,
                         descripcion=f"{bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion}",
-                        es_bonificacion=1,
+                        es_bonificacion=True,
                     )
 
                     mensaje += f" {bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion},"
@@ -327,22 +327,20 @@ class ItemsNotaVentaAPIView(APIView):
                         nota_venta=self.nota_venta,
                         cantidad=bonificacion.cantidad_articulo,
                         descripcion=f"{bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion}",
-                        es_bonificacion=1,
+                        es_bonificacion=True,
                     )
                     mensaje += f" {bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion},"
-
                 # Descuento
                 porcentaje_descuento = promocion.porcentaje_descuento
                 descuento_monto = importe_compra * (porcentaje_descuento / 100)
                 mensaje += f" y se aplica un descuento del {porcentaje_descuento}%."
-
                 ItemsNotaVenta.objects.create(
                     articulo=articulo,
                     nota_venta=self.nota_venta,
                     cantidad=cantidad_comprada,
                     descripcion=f"Descuento del {porcentaje_descuento}% aplicado a {cantidad_comprada} unidades de {articulo.descripcion}.",
                     descuento_unitario=descuento_monto,
-                    es_bonificacion=0,
+                    es_bonificacion=True,
                 )
 
                 self.add_message(mensaje)
@@ -387,3 +385,41 @@ def eliminar_item_nota_venta_api(request, item_id):
         return JsonResponse({'success': True})
     except ItemsNotaVenta.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'El item de la nota de venta no existe'})
+    
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+
+from django.http import JsonResponse
+
+@api_view(['POST'])
+def confirmar_nota_venta(request, nota_venta_id):
+    if request.method == 'POST':
+        nota_venta = get_object_or_404(NotasVenta, id=nota_venta_id)
+
+        total_pedido = sum(item.total_item for item in nota_venta.itemsnotaventa_set.all())
+
+        nota_venta.total_pedido = total_pedido
+        nota_venta.save()
+
+        return JsonResponse({'message': 'Nota de venta confirmada exitosamente', 'total_pedido': total_pedido})
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Promocion
+from .serializers import PromocionSerializer
+
+class ActivarInactivarPromocion(APIView):
+    def put(self, request, pk):
+        promocion = get_object_or_404(Promocion, pk=pk)
+        promocion.activo = not promocion.activo  # Cambia el estado de activo a inactivo o viceversa
+        promocion.save()
+
+        serializer = PromocionSerializer(promocion)
+        return Response(serializer.data)
