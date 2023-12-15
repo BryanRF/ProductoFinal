@@ -98,19 +98,23 @@
   });
   function actualizarTabla() {
     if (dataTableInstance) {
-        dataTableInstance.one('draw.dt', function () {
-            var sumaTotalItem = dataTableInstance
-                .rows()
-                .data()
-                .pluck("total_item")
-                .reduce(function (acc, val) {
-                    return acc + parseFloat(val);
-                }, 0);
-            console.log(sumaTotalItem);
-
-            // Mostrar la suma en el campo de entrada
-            $("#total_max").val(sumaTotalItem);
-        });
+      dataTableInstance.one('draw.dt', function () {
+        var sumaTotalItem = dataTableInstance
+            .rows()
+            .data()
+            .pluck("total_item")
+            .reduce(function (acc, val) {
+                return acc + parseFloat(val);
+            }, 0);
+    
+        // Redondear a dos decimales
+        sumaTotalItem = parseFloat(sumaTotalItem.toFixed(2));
+    
+    
+        // Mostrar la suma en el campo de entrada
+        $("#total_max").val(sumaTotalItem);
+    });
+    
 
         dataTableInstance.ajax.reload(null, false);
     }

@@ -1,15 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status,generics
+from rest_framework import status
 from django.http import JsonResponse
 from .models import *
 from .serializers import *
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from datetime import datetime
-from decimal import Decimal
 from django.views.decorators.http import require_POST
 @csrf_exempt
 def promocion_list_create(request):
@@ -101,7 +98,7 @@ class ItemsNotaVentaAPIView(APIView):
             self.caso8(id_articulo, cantidad_comprada)
             self.caso9(id_articulo, cantidad_comprada)
             self.serializer.validated_data['descripcion'] = ", ".join(self.messages)
-            data = {'message':  self.get_messages(), 'descripcion':self.serializer.validated_data['descripcion']}
+            data = {'message':  self.get_messages()}
             self.serializer.save()
             return JsonResponse(data, status=200)
         return Response(self.serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -119,21 +116,21 @@ class ItemsNotaVentaAPIView(APIView):
             tipo_promocion='caso_1',
             tipo_cliente=self.nota_venta.cliente.canal_cliente,
             articulo_aplicable=articulo,
-            cantidad_minima_compra=cantidad_comprada*articulo.precio_unitario,
             activo=True
         ).first()
-        print(promocion)
+
         if promocion:
-            cantidad_bonificada = promocion.unidades_bonificadas
-            mensaje= f"Tu venta ha sido bonificada con {cantidad_bonificada} {promocion.articulo_bonificacion.descripcion}"
-            ItemsNotaVenta.objects.create(
-                articulo=promocion.articulo_bonificacion,
-                nota_venta=self.nota_venta,
-                cantidad=cantidad_bonificada,
-                descuento_unitario=100,  # Ajusta el descuento unitario según sea necesario
-                es_bonificacion=True,
-            )
-            self.add_message(mensaje)
+            if promocion.cantidad_minima_compra >= cantidad_comprada:
+                cantidad_bonificada = promocion.unidades_bonificadas
+                mensaje= f"Tu venta ha sido bonificada con {cantidad_bonificada} {promocion.articulo_bonificacion.descripcion}"
+                ItemsNotaVenta.objects.create(
+                    articulo=promocion.articulo_bonificacion,
+                    nota_venta=self.nota_venta,
+                    cantidad=cantidad_bonificada,
+                    descuento_unitario=100,  # Ajusta el descuento unitario según sea necesario
+                    es_bonificacion=True,
+                )
+                self.add_message(mensaje)
         
     def caso2(self, id_articulo, cantidad_comprada):
         try:
@@ -293,9 +290,9 @@ class ItemsNotaVentaAPIView(APIView):
                 for bonificacion in promocion.promocion_articulos_bonificados.all():
                     ItemsNotaVenta.objects.create(
                         articulo=bonificacion.articulo,
+                    descuento_unitario=100,  # Ajusta el descuento unitario según sea necesario
                         nota_venta=self.nota_venta,
                         cantidad=bonificacion.cantidad_articulo,
-                        descripcion=f"{bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion}",
                         es_bonificacion=True,
                     )
 
@@ -326,7 +323,7 @@ class ItemsNotaVentaAPIView(APIView):
                         articulo=bonificacion.articulo,
                         nota_venta=self.nota_venta,
                         cantidad=bonificacion.cantidad_articulo,
-                        descripcion=f"{bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion}",
+                    descuento_unitario=100,  # Ajusta el descuento unitario según sea necesario
                         es_bonificacion=True,
                     )
                     mensaje += f" {bonificacion.cantidad_articulo} unidades de {bonificacion.articulo.descripcion},"
@@ -338,8 +335,7 @@ class ItemsNotaVentaAPIView(APIView):
                     articulo=articulo,
                     nota_venta=self.nota_venta,
                     cantidad=cantidad_comprada,
-                    descripcion=f"Descuento del {porcentaje_descuento}% aplicado a {cantidad_comprada} unidades de {articulo.descripcion}.",
-                    descuento_unitario=descuento_monto,
+                    descuento_unitario=porcentaje_descuento,
                     es_bonificacion=True,
                 )
 

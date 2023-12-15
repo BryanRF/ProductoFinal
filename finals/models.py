@@ -234,13 +234,13 @@ class Promocion(models.Model):
     tipo_cliente = models.ForeignKey(CanalCliente, on_delete=models.CASCADE, related_name='promociones', blank=True, null=True)
     cantidad_minima_compra = models.PositiveIntegerField(default=0, blank=True, null=True)
     cantidad_maxima_compra = models.PositiveIntegerField(default=0, blank=True, null=True)
-    unidades_bonificadas = models.PositiveIntegerField(default=0, blank=True, null=True)
     monto_minimo = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, blank=True, null=True)
     monto_maximo = models.DecimalField(max_digits=10, decimal_places=2,default=0.0, blank=True, null=True)
     porcentaje_descuento = models.DecimalField(max_digits=5,decimal_places=2, default=0.00,blank=True,null=True)
     proveedor = models.ForeignKey(GruposProveedor, on_delete=models.CASCADE, related_name='promociones', blank=True, null=True)
     articulo_aplicable = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='productos_aplicables', blank=True, null=True)
     articulo_bonificacion = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='productos_bonificacion', blank=True, null=True)
+    unidades_bonificadas = models.PositiveIntegerField(default=0, blank=True, null=True)
     activo = models.BooleanField(default=False)
 
     def estado_activo(self):
