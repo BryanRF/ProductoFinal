@@ -28,8 +28,8 @@
                         <tr>
                             <td>{{ unidad.unidad_nombre }}</td>
                             <td>
-                                <a href="{% url 'editar_unidad_medida' unidad.pk %}" class="btn btn-sm "><i class="bi bi-pencil-square"></i></a>
-                                <a href="{% url 'eliminar_unidad_medida' unidad.pk %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
+                                <a href="{% url 'editar_unidad_medida' unidad.id%}" class="btn btn-sm "><i class="bi bi-pencil-square"></i></a>
+                                <a href="{% url 'eliminar_unidad_medida' unidad.id %}" class="btn btn-sm "><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
                         {% endfor %}

@@ -235,8 +235,8 @@ def agregar_unidad_medida(request):
         form = UnidadesMedidaForm()
     return render(request, 'unidad_medida/agregar_editar_unidad_medida.html', {'form': form})
 
-def editar_unidad_medida(request, id):
-    unidad = get_object_or_404(UnidadesMedida, id=id)
+def editar_unidad_medida(request ,unidad_medida_id):
+    unidad = get_object_or_404(UnidadesMedida, id=unidad_medida_id)
     if request.method == 'POST':
         form = UnidadesMedidaForm(request.POST, instance=unidad)
         if form.is_valid():
@@ -246,8 +246,8 @@ def editar_unidad_medida(request, id):
         form = UnidadesMedidaForm(instance=unidad)
     return render(request, 'unidad_medida/agregar_editar_unidad_medida.html', {'form': form})
 
-def eliminar_unidad_medida(request, id):
-    unidad = get_object_or_404(UnidadesMedida, id=id)
+def eliminar_unidad_medida(request, unidad_medida_id):
+    unidad = get_object_or_404(UnidadesMedida, id=unidad_medida_id)
     unidad.delete()
     return redirect('listar_unidades_medida')
 #----------------------Usuarios-------------------

@@ -47,8 +47,9 @@ class GruposProveedor(models.Model):
     activo = models.BooleanField()
     responsable_grupo = models.CharField(max_length=25)
 
+   
     def __str__(self):
-        return f'{self.codigo_grupo}'
+        return f'{self.codigo_grupo} - {self.grupo_descripcion} '
 
     def estado_activo(self):
         if self.activo:
@@ -63,17 +64,21 @@ class LineasArticulos(models.Model):
     grupo = models.ForeignKey(GruposProveedor, on_delete=models.CASCADE)
     activo = models.BooleanField()
     responsable_linea = models.CharField(max_length=25)
-    def __str__(self):
-        return self.codigo_linea
 
+    def __str__(self):
+        return f"{self.codigo_linea}  - {self.linea_descripcion} "
+
+    
 class SublineasArticulos(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     codigo_sublinea = models.CharField(max_length=15)
     sublinea_descripcion = models.CharField(max_length=100)
     linea = models.ForeignKey(LineasArticulos, on_delete=models.CASCADE)
     estado = models.BooleanField()
+
     def __str__(self):
-        return self.codigo_sublinea
+        return f"{self.codigo_sublinea}  - {self.sublinea_descripcion} "
+    
 
 class UnidadesMedida(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -112,7 +117,7 @@ class Clientes(models.Model):
     direccion = models.CharField(max_length=150)
     canal_cliente = models.ForeignKey(CanalCliente,on_delete=models.CASCADE)
     def __str__(self):
-        return self.nro_documento
+        return f"{self.nro_documento}  - {self.nombre_razon_social} "
 
 class CondicionVentas(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -158,7 +163,7 @@ class NotasVenta(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
     sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE)
-    fecha_pedido = models.DateTimeField(default=timezone.now)
+    fecha_pedido = models.DateTimeField(default=timezone.now) #da la fecha automatico
     tipo_pedido = models.ForeignKey(TipoPedido, on_delete=models.CASCADE)
     cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE)
     condicion_venta = models.ForeignKey(CondicionVentas, on_delete=models.CASCADE)
@@ -232,13 +237,14 @@ class Promocion(models.Model):
     fecha_inicio = models.DateTimeField(blank=True, null=True)
     fecha_fin = models.DateTimeField(blank=True, null=True)
     tipo_cliente = models.ForeignKey(CanalCliente, on_delete=models.CASCADE, related_name='promociones', blank=True, null=True)
-    cantidad_minima_compra = models.PositiveIntegerField(default=0, blank=True, null=True)
+    cantidad_minima_compra = models.PositiveIntegerField(default=0, blank=True, null=True)#cantidad de productos comprados
     cantidad_maxima_compra = models.PositiveIntegerField(default=0, blank=True, null=True)
     monto_minimo = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, blank=True, null=True)
-    monto_maximo = models.DecimalField(max_digits=10, decimal_places=2,default=0.0, blank=True, null=True)
+    monto_maximo = models.DecimalField(max_digits=10, decimal_places=2,default=0.0, blank=True, null=True) #cantidad x precio unitario
     porcentaje_descuento = models.DecimalField(max_digits=5,decimal_places=2, default=0.00,blank=True,null=True)
     proveedor = models.ForeignKey(GruposProveedor, on_delete=models.CASCADE, related_name='promociones', blank=True, null=True)
     articulo_aplicable = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='productos_aplicables', blank=True, null=True)
+    #solo si la promocion se aplica a un articulo
     articulo_bonificacion = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name='productos_bonificacion', blank=True, null=True)
     unidades_bonificadas = models.PositiveIntegerField(default=0, blank=True, null=True)
     activo = models.BooleanField(default=False)
@@ -248,6 +254,8 @@ class Promocion(models.Model):
     def __str__(self):
         return self.descripcion
 
+
+  #-----------uno a muchos articulos asociados-------------
 class Promocion_articulos_asociados(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     promocion = models.ForeignKey(Promocion, on_delete=models.CASCADE)

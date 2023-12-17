@@ -9,10 +9,12 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.views.decorators.http import require_POST
 @csrf_exempt
-def promocion_list_create(request):
+def promocion_list_create(request): #api para crear las promociones
     try:
+         # Verifica si la solicitud es de tipo POST
         if request.method == 'POST':
             data = json.loads(request.body)
+            # Convierte los datos del cuerpo de la solicitud JSON a un diccionario
             tipo_promocion = data.get('tipo_promocion')
             descripcion = data.get('descripcion')
             fecha_inicio = data.get('fecha_inicio')
@@ -27,6 +29,7 @@ def promocion_list_create(request):
             proveedor_id = data.get('proveedor')
             articulo_aplicable_id = data.get('articulo_aplicable')
             articulo_bonificacion_id = data.get('articulo_bonificacion')
+            # Crea una nueva instancia
             promocion = Promocion.objects.create(
                 tipo_promocion=tipo_promocion,
                 descripcion=descripcion,
@@ -45,6 +48,7 @@ def promocion_list_create(request):
                 activo=True,
             )
 
+            # Procesa los datos de los artículos asociados
             articulos_asociados = data.get('articulosSeleccionadosModal', [])
             for articulo in articulos_asociados:
                 cantidad = articulo.get('cantidad')
@@ -66,22 +70,26 @@ def promocion_list_create(request):
                     articulo_id=articulo_id
                 )
 
+            # Devuelve una respuesta JSON indicando que la promoción se creó con éxito
             return JsonResponse({'message': 'Promoción creada exitosamente', 'ok':True}, status=201)
     except Exception as e:
+            # Captura excepciones generales y devuelve un mensaje de error
             return JsonResponse({'message': f'Error al procesar la solicitud: {str(e)}', 'ok':False}, status=500)
 
     return JsonResponse({'message': 'Método no permitido', 'ok':False}, status=405)
 
 
 
-
+# Definición de una clase de vista basada en API para manejar los ítems de nota de venta
 class ItemsNotaVentaAPIView(APIView):
+    # Constructor de la clase
     def __init__(self, *args, **kwargs):
         super(ItemsNotaVentaAPIView, self).__init__(*args, **kwargs)
-        self.messages = []
-        self.nota_venta= None
-        self.serializer= None
-        
+        self.messages = [] # Lista para almacenar mensajes relacionados con la venta
+        self.nota_venta= None # Variable para almacenar la instancia de NotasVenta
+        self.serializer= None #Variable para almacenar el serializer
+
+# Método POST para procesar la creación de ítems de nota de venta
     def post(self, request, *args, **kwargs):
         self.serializer = ItemsNotaVentaSerializer (data=request.data)
         if self.serializer.is_valid():
@@ -112,15 +120,17 @@ class ItemsNotaVentaAPIView(APIView):
             articulo = Articulo.objects.get(pk=id_articulo)
         except Articulo.DoesNotExist:
             return
-        promocion = Promocion.objects.filter(
+        promocion = Promocion.objects.filter( #realiza la busqueda
             tipo_promocion='caso_1',
             tipo_cliente=self.nota_venta.cliente.canal_cliente,
             articulo_aplicable=articulo,
             activo=True
         ).first()
 
+#aplica la condicion
         if promocion:
-            if promocion.cantidad_minima_compra >= cantidad_comprada:
+            if promocion.cantidad_minima_compra <= cantidad_comprada:
+                # 7 >= 2
                 cantidad_bonificada = promocion.unidades_bonificadas
                 mensaje= f"Tu venta ha sido bonificada con {cantidad_bonificada} {promocion.articulo_bonificacion.descripcion}"
                 ItemsNotaVenta.objects.create(
@@ -145,7 +155,7 @@ class ItemsNotaVentaAPIView(APIView):
         ).first()
 
         if promocion :
-            if promocion.monto_minimo >= (cantidad_comprada * articulo.precio_unitario):
+            if promocion.monto_minimo <= (cantidad_comprada * articulo.precio_unitario):
                 porcentaje_descuento = promocion.porcentaje_descuento
                 descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
                 mensaje = f"Por la compra de S/{cantidad_comprada * articulo.precio_unitario:.2f} en productos del proveedor {articulo.grupo}, se otorga un descuento del {porcentaje_descuento}%."
@@ -190,13 +200,15 @@ class ItemsNotaVentaAPIView(APIView):
             return
         promocion_asociada = Promocion_articulos_asociados.objects.filter(
             promocion__tipo_promocion='caso_4',
+            
             articulo=articulo,
             promocion__activo=True
         ).order_by('-cantidad_articulo').first()
-        
+        print(promocion_asociada,'promocion_asociada')
         if promocion_asociada :
             min = promocion_asociada.promocion.cantidad_minima_compra
-            max = promocion_asociada.promocion.cantidad_minima_compra
+            max = promocion_asociada.promocion.cantidad_maxima_compra
+            
             if (min <= cantidad_comprada <= max):
                 porcentaje_descuento = promocion_asociada.promocion.porcentaje_descuento
                 descuento_monto = cantidad_comprada * articulo.precio_unitario * (porcentaje_descuento / 100)
@@ -217,7 +229,7 @@ class ItemsNotaVentaAPIView(APIView):
 
         promocion = Promocion.objects.filter(
             tipo_promocion='caso_5',
-            tipo_cliente=self.nota_venta.cliente.canal_cliente,
+            # tipo_cliente=self.nota_venta.cliente.canal_cliente,
             articulo_aplicable=articulo,
             activo=True
         ).first()
@@ -341,6 +353,7 @@ class ItemsNotaVentaAPIView(APIView):
 
                 self.add_message(mensaje)
 
+# Vista para obtener los ítems de una nota de venta específica en formato JSON
 def obtener_items_nota_venta(request, nota_venta_id):
     # Filtra los ItemsNotaVenta por la nota_venta específica
     items = ItemsNotaVenta.objects.filter(nota_venta__id=nota_venta_id)
@@ -389,6 +402,8 @@ from django.shortcuts import get_object_or_404
 
 from django.http import JsonResponse
 
+# Vista basada en función para confirmar una nota de venta por su ID
+
 @api_view(['POST'])
 def confirmar_nota_venta(request, nota_venta_id):
     if request.method == 'POST':
@@ -410,6 +425,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Promocion
 from .serializers import PromocionSerializer
+
+# Vista basada en clase para activar/inactivar una promoción por su ID
 
 class ActivarInactivarPromocion(APIView):
     def put(self, request, pk):

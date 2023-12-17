@@ -329,7 +329,8 @@
           ']" value="1" min="1">';
       }
     }
-    $("#myModal").modal("hide");
+    $("#myModal").hide();
+    $(".modal-backdrop").css("display", "none");
     document.getElementById("articulosSeleccionados").style.display = "block";
   }
   function obtenerArticuloPorId(articuloId) {
@@ -384,7 +385,8 @@
           ']" value="1" min="1">';
       }
     }
-    $("#myModalBonificados").modal("hide");
+    $("#myModalBonificados").hide();
+    $(".modal-backdrop").css("display", "none");
     document.getElementById("articulosBonificadosSeleccionados").style.display =
       "block";
   }
@@ -420,12 +422,17 @@
       $('[id^="div_"]').css("display", "none");
 
       // Mostrar campos específicos según el tipo de promoción
+            $("#articulosSeleccionados tbody").empty();
+            $("#articulosBonificadosSeleccionados tbody").empty();
+            $("#formPromocion")[0].reset();
+            $("#id_tipo_promocion").val(tipoPromocion);
 
       switch (tipoPromocion) {
         case "caso_1":
           $(
             "#div_descripcion, #div_articulo_aplicable, #div_articulo_bonificacion, #div_cantidad_minima_compra, #div_unidades_bonificadas, #div_fecha_inicio,#div_fecha_fin,#div_tipo_cliente"
           ).show();
+    
           break;
         case "caso_2":
           $(
@@ -462,8 +469,8 @@
             "#div_descripcion,#div_fecha_inicio,#div_fecha_fin , #div_articulo_aplicable,#div_monto_minimo ,#div_monto_maximo,#div_articulo_bonificacion,#div_unidades_bonificadas ,#div_porcentaje_descuento,#div_tipo_cliente"
           ).show();
           break;
+          
       }
-      // Agrega lógica para otros tipos de promoción si es necesario
     }
 
     // Ejecutar la función al cargar la página
