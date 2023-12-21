@@ -1,3 +1,5 @@
+
+from uuid import UUID
 from django.db import models
 from django.utils import timezone
 import uuid
@@ -18,23 +20,30 @@ class Sucursal(models.Model):
     def __str__(self):
         return self.nombre_comercial 
     
-
+class UnidadesMedida(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    unidad_nombre = models.CharField(max_length=150)
+    def __str__(self):
+        return self.unidad_nombre
 #----------------------Articulo-------------------
 
 class Articulo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     codigo_sku = models.CharField(max_length=25)
     descripcion = models.CharField(max_length=150)
-    unidad_medida = models.ForeignKey('UnidadesMedida', on_delete=models.CASCADE)
+    unidad_medida = models.ForeignKey(UnidadesMedida, on_delete=models.CASCADE)
     grupo = models.ForeignKey('GruposProveedor', on_delete=models.CASCADE)
     linea = models.ForeignKey('LineasArticulos', on_delete=models.CASCADE)
     precio_unitario = models.DecimalField(max_digits=12, decimal_places=2,default=0)
     sublinea = models.ForeignKey('SublineasArticulos', on_delete=models.CASCADE)
+    cantidad_unidad_medida =models.IntegerField(default=1, null=True)
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
     marca = models.ForeignKey('Marcas', on_delete=models.CASCADE)
     def __str__(self):
-        return f"{self.codigo_sku}  - {self.descripcion} - s/. {self.precio_unitario}"
-
+        if self.unidad_medida.unidad_nombre == "paquete":
+            return f"{self.codigo_sku}  - {self.descripcion}  - {self.unidad_medida.unidad_nombre} x {self.cantidad_unidad_medida} - precio unidad: s/. {self.precio_unitario}"
+        else:
+            return f"{self.codigo_sku}  - {self.descripcion}  - {self.unidad_medida.unidad_nombre} -  s/. {self.precio_unitario}"
 class GruposProveedor(models.Model):
     ESTADO_CHOICES = [
         (True, 'Activo'),
@@ -80,11 +89,7 @@ class SublineasArticulos(models.Model):
         return f"{self.codigo_sublinea}  - {self.sublinea_descripcion} "
     
 
-class UnidadesMedida(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    unidad_nombre = models.CharField(max_length=150)
-    def __str__(self):
-        return self.unidad_nombre
+
 
 class Usuarios(models.Model):
 
@@ -187,24 +192,29 @@ class ItemsNotaVenta(models.Model):
     nro_item = models.IntegerField(default=0)
     descripcion = models.JSONField(null=True)
     articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE)
-    cantidad = models.DecimalField(max_digits=12, decimal_places=2)
+    cantidad = models.DecimalField(default=1,max_digits=12, decimal_places=2)
     total_item_bruto = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
     factor_descuento = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
     descuento_unitario = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
     total_item = models.DecimalField(max_digits=12, decimal_places=2 , default=0)
     es_bonificacion = models.BooleanField(default=False)
+    referencia_bonificacion = models.ForeignKey('self', null=True, editable=False, on_delete=models.SET_NULL)
+
 
     def calcular_factor_descuento(self):
-        precio_unitario = self.articulo.precio_unitario
+        precio_unitario = self.articulo.precio_unitario*self.articulo.cantidad_unidad_medida
         total_sin_descuento = precio_unitario * self.cantidad
         total_con_descuento = total_sin_descuento - self.total_item
         self.factor_descuento =total_con_descuento
+        
     def calcular_total_item(self):
-        self.total_item_bruto = (self.articulo.precio_unitario) * self.cantidad
-        descuento = (self.articulo.precio_unitario * self.descuento_unitario) / 100
-        self.total_item = (self.articulo.precio_unitario - descuento) * self.cantidad
+        precio_unitario = self.articulo.precio_unitario*self.articulo.cantidad_unidad_medida
+        self.total_item_bruto = (precio_unitario) * self.cantidad
+        descuento = (precio_unitario * self.descuento_unitario) / 100
+        self.total_item = (precio_unitario - descuento) * self.cantidad
 
     def save(self, *args, **kwargs):
+
         self.calcular_total_item()
         self.calcular_factor_descuento()  # Calcula el factor de descuento antes de guardar
         if not self.nro_item and self.nota_venta:
@@ -214,6 +224,7 @@ class ItemsNotaVenta(models.Model):
             else:
                 self.nro_item = 1
         super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.nro_item} - Total: {self.total_item}"
     
@@ -267,3 +278,11 @@ class Promocion_articulos_bonificados(models.Model):
     promocion = models.ForeignKey(Promocion, on_delete=models.CASCADE)
     cantidad_articulo = models.PositiveIntegerField(default=0, blank=True, null=True)
     articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE)
+
+class DescuentoNotaVenta(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nota_venta = models.ForeignKey(NotasVenta, on_delete=models.CASCADE)
+    porcentaje_descuento = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return f"Descuento para Nota de Venta {self.nota_venta.nro_pedido}: {self.porcentaje_descuento}%"

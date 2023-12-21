@@ -536,20 +536,54 @@ def agregar_item_nota_venta(request, id):
     if request.method == 'POST':
         form = ItemsNotaVentaForm(request.POST)
         if form.is_valid():
+            # Guarda el formulario
             form.save()
-            return redirect('lista_items_nota_venta')
+            # Recalcula el nuevo total después de agregar el nuevo item
+            total_despues_bonificaciones = calcular_total_despues_bonificaciones(nota_venta)
+            porcentaje_descuento = obtener_porcentaje_descuento(nota_venta)
+            # Calcula el descuento en valor absoluto
+            descuento_en_valor = (porcentaje_descuento / 100) * total_despues_bonificaciones
+            # Calcula el nuevo total restando el descuento en valor absoluto
+            nuevo_total = total_despues_bonificaciones - descuento_en_valor
+            # Redondea el nuevo total a dos decimales
+            nuevo_total = round(nuevo_total, 2)
+            # Agrega el nuevo total al contexto del renderizado
+            context = {'form': form, 'nota_venta_data': obtener_datos_nota_venta(nota_venta), 'nuevo_total': str(nuevo_total).replace(',', '.')}
+            return render(request, 'item_nota_venta/agregar_editar_item_nota_venta.html', context)
     else:
         form = ItemsNotaVentaForm()
 
     # Puedes acceder a los valores de id, tipo_pedido y cliente aquí
-    nota_venta_data = {
+    nota_venta_data = obtener_datos_nota_venta(nota_venta)
+    total_despues_bonificaciones = calcular_total_despues_bonificaciones(nota_venta)
+    porcentaje_descuento = obtener_porcentaje_descuento(nota_venta)
+    descuento_en_valor = (porcentaje_descuento / 100) * total_despues_bonificaciones
+    nuevo_total = total_despues_bonificaciones - descuento_en_valor
+    nuevo_total = round(nuevo_total, 2)
+    print('nuevo_total',nuevo_total)
+    return render(request, 'item_nota_venta/agregar_editar_item_nota_venta.html', {'form': form, 'nota_venta_data': nota_venta_data, 'nuevo_total': str(nuevo_total).replace(',', '.')})
+
+def calcular_total_despues_bonificaciones(nota_venta):
+    # Realiza el cálculo del total después de aplicar las bonificaciones
+    # Puedes implementar lógica adicional según tu modelo y requerimientos
+    # Por ejemplo, sumar los totales de los items de la nota de venta
+    total_despues_bonificaciones = sum(item.total_item for item in nota_venta.itemsnotaventa_set.all())
+    return float(total_despues_bonificaciones)
+
+def obtener_porcentaje_descuento(nota_venta):
+    # Implementa la lógica para obtener el porcentaje de descuento según tu modelo y requerimientos
+    # Por ejemplo, consulta la base de datos u otros datos necesarios
+    # Aquí, se devuelve un valor de ejemplo, asegúrate de ajustar según tus necesidades
+    return 10  # Supongamos que el porcentaje de descuento es 10%
+
+def obtener_datos_nota_venta(nota_venta):
+    # Obtén los datos de la nota de venta para incluir en el contexto del renderizado
+    return {
         'id': nota_venta.id,
         'tipo_pedido': nota_venta.tipo_pedido.tipo_pedido_nombre,
         'cliente': nota_venta.cliente.nombre_razon_social,
         'tipo_cliente': nota_venta.cliente.canal_cliente.canal_cliente_descripcion,
     }
-
-    return render(request, 'item_nota_venta/agregar_editar_item_nota_venta.html', {'form': form, 'nota_venta_data': nota_venta_data})
 
 def editar_item_nota_venta(request, item_id):
     item_nota_venta = get_object_or_404(ItemsNotaVenta, id=item_id)

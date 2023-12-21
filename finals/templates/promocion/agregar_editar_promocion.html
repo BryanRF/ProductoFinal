@@ -446,7 +446,7 @@
           break;
         case "caso_4":
           $(
-            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin , #div_porcentaje_descuento,#div_productos_asociados ,#div_cantidad_minima_compra,#div_cantidad_maxima_compra"
+            "#div_descripcion,#div_fecha_inicio,#div_fecha_fin ,#div_tipo_cliente, #div_porcentaje_descuento,#div_productos_asociados ,#div_cantidad_minima_compra,#div_cantidad_maxima_compra"
           ).show();
           break;
         case "caso_5":
@@ -539,6 +539,34 @@
     }
 </script>
 
+<script>
+  // Elimina la opción con "---------" y agrega la opción "Todos"
+  document.addEventListener('DOMContentLoaded', function () {
+      var selectTipoCliente = document.getElementById('id_tipo_cliente');
+      var optionTodos = document.createElement('option');
+      optionTodos.value = '';
+      optionTodos.text = 'Todos';
 
+      // Elimina la opción existente con "---------"
+      selectTipoCliente.removeChild(selectTipoCliente.firstChild);
+
+      // Agrega la opción "Todos" al principio del select
+      selectTipoCliente.insertBefore(optionTodos, selectTipoCliente.firstChild);
+  });
+</script>
+<script>
+  // Elimina la opción con "---------" al cargar la página
+  document.addEventListener('DOMContentLoaded', function () {
+      var selectTipoCliente = document.getElementById('id_tipo_cliente');
+      
+      // Itera sobre las opciones y elimina la que tiene "---------"
+      for (var i = 0; i < selectTipoCliente.options.length; i++) {
+          if (selectTipoCliente.options[i].text === '---------') {
+              selectTipoCliente.remove(i);
+              break;  // Detén el bucle después de eliminar la opción
+          }
+      }
+  });
+</script>
 
 {% endblock %}

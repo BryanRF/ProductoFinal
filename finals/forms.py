@@ -16,10 +16,11 @@ class EmpresaForm(forms.ModelForm):
 class ArticuloForm(forms.ModelForm):
     class Meta:
         model = Articulo
-        fields = ['codigo_sku', 'precio_unitario', 'descripcion', 'unidad_medida', 'grupo', 'linea', 'sublinea', 'empresa', 'marca']
+        fields = ['codigo_sku', 'precio_unitario', 'descripcion', 'unidad_medida','cantidad_unidad_medida', 'grupo', 'linea', 'sublinea', 'empresa', 'marca']
         widgets = {
             'codigo_sku': forms.TextInput(attrs={'class': 'form-control'}),
             'precio_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
+            'cantidad_unidad_medida': forms.NumberInput(attrs={'class': 'form-control'}),
             'descripcion': forms.TextInput(attrs={'class': 'form-control'}),
             'unidad_medida': forms.Select(attrs={'class': 'form-control'}),
             'grupo': forms.Select(attrs={'class': 'form-control'}),

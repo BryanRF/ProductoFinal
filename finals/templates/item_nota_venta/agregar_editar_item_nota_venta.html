@@ -50,10 +50,10 @@
               <label for="total_max">Monto a pagar total</label>
                 <div class="input-group">
                     <input
-                        type="number"
+                        type="text"
                         readonly
                         min="0"
-                        value="0"
+                        value="{{ nuevo_total|default:'' }}"
                         class="form-control"
                         id="total_max"
                     />
@@ -98,22 +98,7 @@
   });
   function actualizarTabla() {
     if (dataTableInstance) {
-      dataTableInstance.one('draw.dt', function () {
-        var sumaTotalItem = dataTableInstance
-            .rows()
-            .data()
-            .pluck("total_item")
-            .reduce(function (acc, val) {
-                return acc + parseFloat(val);
-            }, 0);
     
-        // Redondear a dos decimales
-        sumaTotalItem = parseFloat(sumaTotalItem.toFixed(2));
-    
-    
-        // Mostrar la suma en el campo de entrada
-        $("#total_max").val(sumaTotalItem);
-    });
     
 
         dataTableInstance.ajax.reload(null, false);
@@ -137,6 +122,13 @@
     })
       .then((response) => response.json())
       .then((data) => {
+        var descuentoEnValor = (data.total_porcentaje / 100) * data.total_despues_bonificaciones;
+
+        // Calcula el nuevo total restando el descuento en valor absoluto
+        var nuevoTotal = data.total_despues_bonificaciones - descuentoEnValor;
+
+        // Actualiza el valor del elemento HTML con id 'total_max'
+        document.getElementById('total_max').value = nuevoTotal.toFixed(2);
         if (Array.isArray(data.message) && data.status == 1) {
           // Si hay más de un mensaje en la lista, mostrar los mensajes con SweetAlert
           const bonificacionesList = data.message.join("\n");
@@ -150,6 +142,8 @@
           }).then((result) => {
             if (result.isConfirmed) {
               document.getElementById("notaVentaForm").reset();
+            
+
             } else {
               window.location.href = "{% url 'lista_items_nota_venta' %}";
             }
@@ -293,7 +287,8 @@
         if (response.success) {
 
           actualizarTabla();
-          
+       
+          document.getElementById('total_max').value = response.nuevoTotal.toFixed(2);
           console.log("Item eliminado exitosamente");
         } else {
           console.error("Error al eliminar el item:", response.error);
